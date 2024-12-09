@@ -1,0 +1,10 @@
+langchain
+langchain_openai
+langchain_huggingface
+langchain_community
+faiss-cpu
+colorama
+openai
+huggingface
+pypdf
+gradio
