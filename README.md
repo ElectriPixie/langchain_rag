@@ -1,4 +1,4 @@
 # langchain_rag
 
 
-openai compatible LLM langchain rag implimentation 
+openai compatible LLM langchain rag implementation 
