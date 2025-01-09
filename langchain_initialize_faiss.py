@@ -12,9 +12,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 pt_model = 'all-MiniLM-L6-v2.pt'
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
-    def __init__(self, model_name: str):
-        self.model = SentenceTransformer(model_name)
-        self.model.load_state_dict(torch.load(pt_model, map_location=torch.device('cpu'), weights_only=True))
+    def __init__(self, model_load_path: str):
+        self.model = SentenceTransformer(model_load_path)
 
     def embed_query(self, query: str):
         return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
@@ -26,13 +25,13 @@ class SentenceTransformerEmbeddings(Embeddings):
 vstoreName = "Book_Collection"
 vstoreDir = "faiss_store/"+vstoreName+"/"
 os.makedirs(vstoreDir, exist_ok=True)
-embedded_model = "sentence-transformers/all-MiniLM-L6-v2"
+model_load_path = 'all-MiniLM-L6-v2/'
 
 # Set default device to CPU
 torch.set_default_device('cpu')
 
 # Create custom embeddings object
-embeddings = SentenceTransformerEmbeddings(model_name=embedded_model)
+embeddings = SentenceTransformerEmbeddings(model_load_path=model_load_path)
 
 # Create the FAISS index
 index = faiss.IndexFlatL2(embeddings.model.get_sentence_embedding_dimension())
