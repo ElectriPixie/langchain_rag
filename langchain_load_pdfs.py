@@ -1,38 +1,115 @@
 import os
-
-from langchain_openai import OpenAIEmbeddings
+from uuid import uuid4
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.vectorstores import FAISS
+import torch
+from sentence_transformers import SentenceTransformer
 import faiss
 from langchain_community.docstore.in_memory import InMemoryDocstore
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from uuid import uuid4
-from langchain_core.documents import Document
+from langchain.embeddings.base import Embeddings
+import json
 
-from langchain_community.document_loaders import PyPDFLoader
+# Define the custom embeddings class that inherits from LangChain's Embeddings class
+class SentenceTransformerEmbeddings(Embeddings):
+    def __init__(self, model_name: str, pt_model: str = None):
+        self.model = SentenceTransformer(model_name)
+        if pt_model:
+            self.model.load_state_dict(torch.load(pt_model, weights_only=True))
 
-pdfDir = "/home/pixie/AI/ai_tools/Llama/data/pdf/"
-vstoreDir = "faiss_store/"
+    def embed_query(self, query: str):
+        return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
+
+    def embed_documents(self, documents: list):
+        return [self.embed_query(doc) for doc in documents]
+
+# Paths and settings
 vstoreName = "Book_Collection"
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"})
+vstoreDir = "faiss_store/" + vstoreName + "/"
+embedded_model = "sentence-transformers/all-MiniLM-L6-v2"
+pt_model = 'all-MiniLM-L6-v2.pt'
+pdfDir = "/home/pixie/AI/ai_tools/Llama/data/pdf/"
 
-vector_store = FAISS.load_local(
-    vstoreDir+vstoreName, embeddings, allow_dangerous_deserialization=True
+# Set default device to CPU
+torch.set_default_device('cpu')
+
+# Create custom embeddings object
+embeddings = SentenceTransformerEmbeddings(model_name=embedded_model)
+
+# Create the FAISS index
+index = faiss.IndexFlatL2(embeddings.model.get_sentence_embedding_dimension())
+
+# Create the FAISS vector store
+vector_store = FAISS(
+    embedding_function=embeddings,  # Pass the custom embeddings object
+    index=index,
+    docstore=InMemoryDocstore(),
+    index_to_docstore_id={},
 )
 
-for file in os.listdir(pdfDir):
-    if file.endswith('.pdf'):
-        pdfName = file
-        print("Loading: " + pdfName)
+# Function to extract text content from a Document object
+def document_to_dict(doc):
+    """
+    Converts a Document object to a dictionary for serialization.
+    
+    Args:
+    - doc: The Document object to convert.
+    
+    Returns:
+    - dict: A dictionary representing the Document object.
+    """
+    # Check for possible attributes that might hold the text
+    if hasattr(doc, 'text'):
+        return {'text': doc.text, 'metadata': doc.metadata}
+    elif hasattr(doc, 'content'):
+        return {'text': doc.content, 'metadata': doc.metadata}
+    elif hasattr(doc, 'page_content'):
+        return {'text': doc.page_content, 'metadata': doc.metadata}
+    elif hasattr(doc, 'raw_text'):
+        return {'text': doc.raw_text, 'metadata': doc.metadata}
+    else:
+        # If no known attributes are found, print the document for inspection
+        print(f"Document structure: {doc}")
+        return {'text': str(doc), 'metadata': None}  # Fallback to string conversion
 
-    file_path = (
-        pdfDir+pdfName
-    )
-    loader = PyPDFLoader(file_path)
-    pages = []
-    for page in loader.lazy_load():
-        pages.append(page)
+# Function to add documents to the FAISS index and the document store
+def add_documents_to_store(pdfDir):
+    all_documents = []  # List to store documents with their UUIDs
+    for file in os.listdir(pdfDir):
+        if file.endswith('.pdf'):
+            pdfName = file
+            print("Loading: " + pdfName)
 
-    uuids = [str(uuid4()) for _ in range(len(pages))]
-    vector_store.add_documents(documents=pages, ids=uuids)
+            file_path = os.path.join(pdfDir, pdfName)
+            loader = PyPDFLoader(file_path)
+            pages = []
+            for page in loader.lazy_load():
+                pages.append(page)
 
-vector_store.save_local(vstoreDir+vstoreName)
+            # Create UUIDs for the documents
+            uuids = [str(uuid4()) for _ in range(len(pages))]
+            
+            # Add documents to FAISS index
+            vector_store.add_documents(documents=pages, ids=uuids)
+
+            # Store documents and their UUIDs for saving
+            for uuid, page in zip(uuids, pages):
+                all_documents.append({"uuid": uuid, "content": page})
+
+    return all_documents
+
+# Add documents to the vector store and retrieve document content
+all_documents = add_documents_to_store(pdfDir)
+
+# Save the FAISS index directly
+faiss.write_index(index, os.path.join(vstoreDir, f"index.faiss"))
+
+# Save the embeddings model weights
+torch.save(embeddings.model.state_dict(), os.path.join(vstoreDir, f"embeddings.pt"))
+
+# Save the document store (in memory)
+docstore_data = {doc["uuid"]: document_to_dict(doc["content"]) for doc in all_documents}
+
+with open(os.path.join(vstoreDir, f"documents.json"), "w") as doc_file:
+    json.dump(docstore_data, doc_file)
+
+print(f"Documents and FAISS index saved to {vstoreDir}")
