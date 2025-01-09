@@ -18,9 +18,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
-    def __init__(self, model_name: str, pt_model: str = None):
-        self.model = SentenceTransformer(model_name)
-        self.model.load_state_dict(torch.load(pt_model, map_location=torch.device('cpu'), weights_only=True))
+    def __init__(self, model_load_path: str):
+        self.model = SentenceTransformer(model_load_path)
 
     def embed_query(self, query: str):
         return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
@@ -35,7 +34,7 @@ torch.set_default_device('cpu')
 # Paths and settings
 vstoreName = "Book_Collection"
 vstoreDir = "faiss_store/" + vstoreName + "/"
-embedded_model = "sentence-transformers/all-MiniLM-L6-v2"
+model_load_path = 'all-MiniLM-L6-v2/'
 pt_model = 'embeddings.pt'  # Path to the saved embeddings.pt file
 pdfDir = "/home/pixie/AI/ai_tools/Llama/data/pdf/"
 user = "User: "
@@ -49,7 +48,7 @@ ragcolor = reset+bright+Fore.GREEN
 ragtext = reset+bright+Fore.CYAN
 
 # Create custom embeddings object and load the saved model weights (embeddings.pt)
-embeddings = SentenceTransformerEmbeddings(model_name=embedded_model, pt_model=os.path.join(vstoreDir, pt_model))
+embeddings = SentenceTransformerEmbeddings(model_load_path=model_load_path)
 embeddings.model.to('cpu')
 
 # Load documents from the JSON file
@@ -130,7 +129,7 @@ def chatFunc(message):
     
     # Get response from the chat model
     response = chat.invoke(messages)
-    if response.content == 'NA':
+    if response.content == 'NA' or response.content == "Not found in current context.":
         #print("context_response: "+response.content)
         knowledge_base = "General Knowledge: \n"
         messages = [
