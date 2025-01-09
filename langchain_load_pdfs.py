@@ -9,12 +9,14 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain.embeddings.base import Embeddings
 import json
 
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
     def __init__(self, model_name: str, pt_model: str = None):
         self.model = SentenceTransformer(model_name)
         if pt_model:
-            self.model.load_state_dict(torch.load(pt_model, weights_only=True))
+            self.model.load_state_dict(torch.load(pt_model, map_location=torch.device('cpu'), weights_only=True))
 
     def embed_query(self, query: str):
         return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()

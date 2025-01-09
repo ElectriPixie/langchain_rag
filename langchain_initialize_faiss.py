@@ -7,12 +7,14 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from langchain.embeddings.base import Embeddings
 
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 pt_model = 'all-MiniLM-L6-v2.pt'
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
     def __init__(self, model_name: str):
         self.model = SentenceTransformer(model_name)
-        self.model.load_state_dict(torch.load(pt_model, weights_only=True))
+        self.model.load_state_dict(torch.load(pt_model, map_location=torch.device('cpu'), weights_only=True))
 
     def embed_query(self, query: str):
         return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
