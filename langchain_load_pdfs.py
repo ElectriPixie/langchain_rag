@@ -102,9 +102,6 @@ all_documents = add_documents_to_store(pdfDir)
 # Save the FAISS index directly
 faiss.write_index(index, os.path.join(vstoreDir, f"index.faiss"))
 
-# Save the embeddings model weights
-torch.save(embeddings.model.state_dict(), os.path.join(vstoreDir, f"embeddings.pt"))
-
 # Save the document store (in memory)
 docstore_data = {doc["uuid"]: document_to_dict(doc["content"]) for doc in all_documents}
 
