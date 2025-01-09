@@ -39,6 +39,15 @@ vstoreDir = "faiss_store/" + vstoreName + "/"
 embedded_model = "sentence-transformers/all-MiniLM-L6-v2"
 pt_model = 'embeddings.pt'  # Path to the saved embeddings.pt file
 pdfDir = "/home/pixie/AI/ai_tools/Llama/data/pdf/"
+user = "User: "
+chatmodel = "\nLlama-RAG - "
+bright = Style.BRIGHT 
+dim = Style.DIM
+reset = Style.RESET_ALL
+usercolor = reset+bright+Fore.GREEN
+usertext = reset+bright+Fore.CYAN
+ragcolor = reset+bright+Fore.GREEN
+ragtext = reset+bright+Fore.CYAN
 
 # Create custom embeddings object and load the saved model weights (embeddings.pt)
 embeddings = SentenceTransformerEmbeddings(model_name=embedded_model, pt_model=os.path.join(vstoreDir, pt_model))
@@ -141,4 +150,4 @@ while True:
         print(Style.RESET_ALL)
         break
     response, knowledge_base = chatFunc(message)
-    print(Fore.GREEN + Style.BRIGHT + "Llama-RAG: " + Style.RESET_ALL + knowledge_base + Fore.CYAN + Style.BRIGHT + response.content + "\n" + Style.RESET_ALL)
+    print(ragcolor + chatmodel + knowledge_base + ragtext + response.content+"\n"+reset)
