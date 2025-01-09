@@ -47,9 +47,6 @@ vector_store = FAISS(
 # Save the FAISS index
 faiss.write_index(index, os.path.join(vstoreDir, f"index.faiss"))
 
-# Save the embeddings model weights
-torch.save(embeddings.model.state_dict(), os.path.join(vstoreDir, f"embeddings.pt"))
-
 # Create and save an empty document store (No documents added yet)
 with open(os.path.join(vstoreDir, f"documents.json"), "w") as doc_file:
     json.dump({}, doc_file)
