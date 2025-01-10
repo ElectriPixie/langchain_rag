@@ -11,7 +11,7 @@ for arg in "$@"; do
       model_name="${arg#--model-name=}"
       ;;
     --cpu*)
-      cpu=true
+      cpu=True
       ;;
   esac
 done
