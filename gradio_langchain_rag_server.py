@@ -127,9 +127,9 @@ def chatFunc(message):
     # Search for relevant documents based on the message
     retrieved_documents = retriever.invoke(message)
     
-    if not retrieved_documents:
-        knowledge_base = "General Knowledge: \n"
-        return chat_with_general_knowledge(message)
+    #if not retrieved_documents:
+    #    knowledge_base = "General Knowledge: \n"
+    #    return chat_with_general_knowledge(message)
     
     # Create a retriever from the documents and use similarity search
     db = FAISS.from_documents(retrieved_documents, embeddings)
