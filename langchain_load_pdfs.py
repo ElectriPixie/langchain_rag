@@ -8,8 +8,35 @@ import faiss
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain.embeddings.base import Embeddings
 import json
+import argparse
 
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+parser = argparse.ArgumentParser()
+
+# Define the arguments
+parser.add_argument('--vstoreName', type=str, default='Book_Collection')
+parser.add_argument('--vstoreDir', type=str, default='faiss_store')
+parser.add_argument('--pdfDir', type=str, default='pdf')
+parser.add_argument('--model_load_path', type=str, default='all-MiniLM-L6-v2/')
+parser.add_argument("--cpu", choices=["True", "False"], default="False")
+# Parse the arguments
+args = parser.parse_args()
+
+
+def add_trailing_slash(path):
+    if not path.endswith('/'):
+        path += '/'
+    return path
+
+# Assign the values to the variables
+vstoreName = add_trailing_slash(args.vstoreName)
+vstoreDir = add_trailing_slash(args.vstoreDir)
+vstorePath = vstoreDir+vstoreName
+pdfDir = add_trailing_slash(args.pdfDir)
+model_load_path = args.model_load_path
+cpu = args.cpu
+
+if cpu:
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
@@ -17,16 +44,13 @@ class SentenceTransformerEmbeddings(Embeddings):
         self.model = SentenceTransformer(model_load_path)
 
     def embed_query(self, query: str):
-        return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
+        if cpu: 
+            return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
+        else:
+            return self.model.encode([query], convert_to_tensor=True)[0].numpy()
 
     def embed_documents(self, documents: list):
         return [self.embed_query(doc) for doc in documents]
-
-# Paths and settings
-vstoreName = "Book_Collection"
-vstoreDir = "faiss_store/" + vstoreName + "/"
-pdfDir = "/home/pixie/AI/ai_tools/Llama/data/pdf/"
-model_load_path = 'all-MiniLM-L6-v2/'
 
 # Set default device to CPU
 torch.set_default_device('cpu')
@@ -100,12 +124,12 @@ def add_documents_to_store(pdfDir):
 all_documents = add_documents_to_store(pdfDir)
 
 # Save the FAISS index directly
-faiss.write_index(index, os.path.join(vstoreDir, f"index.faiss"))
+faiss.write_index(index, os.path.join(vstorePath, f"index.faiss"))
 
 # Save the document store (in memory)
 docstore_data = {doc["uuid"]: document_to_dict(doc["content"]) for doc in all_documents}
 
-with open(os.path.join(vstoreDir, f"documents.json"), "w") as doc_file:
+with open(os.path.join(vstorePath, f"documents.json"), "w") as doc_file:
     json.dump(docstore_data, doc_file)
 
-print(f"Documents and FAISS index saved to {vstoreDir}")
+print(f"Documents and FAISS index saved to {vstorePath}")
