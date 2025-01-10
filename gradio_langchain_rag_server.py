@@ -11,7 +11,6 @@ from langchain.embeddings.base import Embeddings
 import json
 from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage
-from colorama import Fore, Style
 from langchain.schema import Document
 import argparse
 
