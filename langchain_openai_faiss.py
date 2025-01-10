@@ -155,11 +155,11 @@ def chatFunc(message):
     
     # Get response from the chat model
     response = chat.invoke(messages)
-    if 'confidence' in response:
-        confidence = response['confidence']
-    else:
-        confidence = "None"
-    print("Confidence: "+confidence)
+    #if 'confidence' in response:
+    #    confidence = response['confidence']
+    #else:
+    #    confidence = "None"
+    #print("Confidence: "+confidence)
     if response.content == 'NA' or response.content == "Not found in current context.":
         #print("context_response: "+response.content)
         knowledge_base = "General Knowledge: \n"
