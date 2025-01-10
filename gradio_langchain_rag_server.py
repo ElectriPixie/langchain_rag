@@ -32,6 +32,7 @@ def add_trailing_slash(path):
     return path
 
 # Assign the values to the variables
+skipToGeneralKnowlege = 1
 vstoreName = add_trailing_slash(args.vstoreName)
 vstoreDir = add_trailing_slash(args.vstoreDir)
 vstorePath = vstoreDir+vstoreName
@@ -127,9 +128,10 @@ def chatFunc(message):
     # Search for relevant documents based on the message
     retrieved_documents = retriever.invoke(message)
     
-    #if not retrieved_documents:
-    #    knowledge_base = "General Knowledge: \n"
-    #    return chat_with_general_knowledge(message)
+    if skipToGeneralKnowlege:
+        if not retrieved_documents:
+           knowledge_base = "General Knowledge: \n"
+           return chat_with_general_knowledge(message)
     
     # Create a retriever from the documents and use similarity search
     db = FAISS.from_documents(retrieved_documents, embeddings)
