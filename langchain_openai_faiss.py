@@ -172,6 +172,17 @@ def chatFunc(message):
         response = chat.invoke(messages)
     return response, knowledge_base
 
+# Fallback to general knowledge when no relevant documents are found
+def chat_with_general_knowledge(message):
+    messages = [
+        SystemMessage(
+            content="You are an AI assistant that answers questions with general knowledge."
+        ),
+        HumanMessage(content=message),
+    ]
+    response = chat.invoke(messages)
+    return response.content
+
 # Interactive loop for user input and AI response
 while True:
     message = input(Fore.GREEN + Style.BRIGHT + "User: " + Style.RESET_ALL + "\n" + Fore.CYAN + Style.BRIGHT)
