@@ -41,12 +41,12 @@ parser = argparse.ArgumentParser(prog=prog_name)
 parser.add_argument('--modelName', 
                     type=str, 
                     default='all-MiniLM-L6-v2', 
-                    help='The name of the model to be used. (e.g. "all-MiniLM-L6-v2")')
+                    help='Model name: The name of the model to be used. This is used to load the model. (e.g. "all-MiniLM-L6-v2")')
 
 # Add a command-line flag for the CPU usage
 parser.add_argument("--cpu", 
                     action='store_true', 
-                    help='Run on CPU')
+                    help='Device: Run on CPU instead of GPU. (Default: GPU)')
 
 args = parser.parse_args()
 modelName = args.modelName
