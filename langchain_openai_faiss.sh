@@ -5,6 +5,7 @@ vstoreName="Book_Collection"
 vstoreDir="faiss_store"
 modelPath="all-MiniLM-L6-v2/"
 cpu="False"
+help="False"
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
