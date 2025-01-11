@@ -10,6 +10,36 @@ from langchain.embeddings.base import Embeddings
 import json
 import argparse
 import sys
+import psutil
+
+# Get the parent process ID
+parent_pid = os.getppid()
+
+# Fetch the parent process
+parent_process = psutil.Process(parent_pid)
+
+# Use cmdline to get the full command with arguments
+parent_cmdline = parent_process.cmdline()
+
+# Extract the calling script name from cmdline
+if len(parent_cmdline) > 1:  # Check if there are arguments
+    run_script_name = os.path.basename(parent_cmdline[1])  # Get only the file name
+else:
+    run_script_name = "Unknown"
+
+# Get the current Python script name
+script_name = os.path.basename(__file__)
+
+# Remove extensions for comparison
+run_script_base = os.path.splitext(run_script_name)[0]
+script_base = os.path.splitext(script_name)[0]
+
+# Compare base names
+if run_script_base == script_base:
+    prog_name=run_script_name
+else:
+    prog_name=script_name
+
 
 def add_trailing_slash(path):
     if not path.endswith('/'):
@@ -17,7 +47,7 @@ def add_trailing_slash(path):
     return path
 
 # Argument Parser
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(prog=prog_name)
 
 def print_help_and_exit():
     parser.print_help()
