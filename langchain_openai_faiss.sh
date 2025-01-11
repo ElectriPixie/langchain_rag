@@ -7,22 +7,42 @@ model_load_path="all-MiniLM-L6-v2/"
 cpu="False"
 
 # Parse command-line arguments
-for arg in "$@"; do
-  case $arg in
-    --vstoreName*)
-      vstoreName="${arg#--vstoreName=}"
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --vstoreName)
+      if [[ -n $2 && $2 != -* ]]; then
+        vstoreName="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
       ;;
-    --vstoreDir*)
-      vstoreDir="${arg#--vstoreDir=}"
+    --vstoreDir)
+      if [[ -n $2 && $2 != -* ]]; then
+        vstoreDir="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
       ;;
-    --model_load_path*)
-      model_load_path="${arg#--model_load_path=}"
+    --model_load_path)
+      if [[ -n $2 && $2 != -* ]]; then
+        model_load_path="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
       ;;
-    --cpu*)
+    --cpu)
       cpu="True"
+      shift
       ;;
   esac
 done
 
 # Run the Python script with arguments
-python3 langchain_openai_faiss.py --vstoreName $vstoreName --vstoreDir $vstoreDir --model_load_path $model_load_path --cpu $cpu
+python3 langchain_openai_faiss.py \
+  --vstoreName    "$vstoreName" \
+  --vstoreDir    "$vstoreDir" \
+  --model_load_path "$model_load_path" \
+  --cpu          "$cpu"

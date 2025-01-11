@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 # Define the arguments
 parser.add_argument('--vstoreName', type=str, default='Book_Collection')
 parser.add_argument('--vstoreDir', type=str, default='faiss_store')
-parser.add_argument('--model_load_path', type=str, default='all-MiniLM-L6-v2/')
+parser.add_argument('--modelPath', type=str, default='all-MiniLM-L6-v2/')
 parser.add_argument("--cpu", choices=["True", "False"], default="False")
 # Parse the arguments
 args = parser.parse_args()
@@ -35,7 +35,7 @@ skipToGeneralKnowlege = 1
 vstoreName = add_trailing_slash(args.vstoreName)
 vstoreDir = add_trailing_slash(args.vstoreDir)
 vstorePath = vstoreDir+vstoreName
-model_load_path = args.model_load_path
+modelPath = args.modelPath
 cpu = args.cpu
 
 if cpu:
@@ -44,8 +44,8 @@ if cpu:
 
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
-    def __init__(self, model_load_path: str):
-        self.model = SentenceTransformer(model_load_path)
+    def __init__(self, modelPath: str):
+        self.model = SentenceTransformer(modelPath)
 
     def embed_query(self, query: str):
         if cpu: 
@@ -72,7 +72,7 @@ ragcolor = reset+bright+Fore.GREEN
 ragtext = reset+bright+Fore.CYAN
 
 # Create custom embeddings object and load the saved model weights (embeddings.pt)
-embeddings = SentenceTransformerEmbeddings(model_load_path=model_load_path)
+embeddings = SentenceTransformerEmbeddings(modePath=modelPath)
 if cpu:
     embeddings.model.to('cpu')
 

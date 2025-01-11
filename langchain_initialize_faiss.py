@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 # Define the arguments
 parser.add_argument('--vstoreName', type=str, default='Book_Collection')
 parser.add_argument('--vstoreDir', type=str, default='faiss_store/')
-parser.add_argument('--model_load_path', type=str, default='all-MiniLM-L6-v2/')
+parser.add_argument('--modelPath', type=str, default='all-MiniLM-L6-v2/')
 parser.add_argument("--cpu", choices=["True", "False"], default="False")
 # Parse the arguments
 args = parser.parse_args()
@@ -27,7 +27,7 @@ def add_trailing_slash(path):
 # Assign the values to the variables
 vstoreName = add_trailing_slash(args.vstoreName)
 vstoreDir = add_trailing_slash(args.vstoreDir)
-model_load_path = args.model_load_path
+modelPath = args.modelPath
 vstorePath = vstoreDir+vstoreName
 cpu = args.cpu
 
@@ -38,8 +38,8 @@ os.makedirs(vstorePath, exist_ok=True)
 
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
-    def __init__(self, model_load_path: str):
-        self.model = SentenceTransformer(model_load_path)
+    def __init__(self, modelPath: str):
+        self.model = SentenceTransformer(modelPath)
 
     def embed_query(self, query: str):
         if cpu: 
@@ -54,7 +54,7 @@ class SentenceTransformerEmbeddings(Embeddings):
 torch.set_default_device('cpu')
 
 # Create custom embeddings object
-embeddings = SentenceTransformerEmbeddings(model_load_path=model_load_path)
+embeddings = SentenceTransformerEmbeddings(modelPath=modelPath)
 
 # Create the FAISS index
 index = faiss.IndexFlatL2(embeddings.model.get_sentence_embedding_dimension())

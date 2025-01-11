@@ -9,41 +9,56 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain.embeddings.base import Embeddings
 import json
 import argparse
-
-parser = argparse.ArgumentParser()
-
-# Define the arguments
-parser.add_argument('--vstoreName', type=str, default='Book_Collection')
-parser.add_argument('--vstoreDir', type=str, default='faiss_store')
-parser.add_argument('--pdfDir', type=str, default='pdf')
-parser.add_argument('--model_load_path', type=str, default='all-MiniLM-L6-v2/')
-parser.add_argument("--cpu", choices=["True", "False"], default="False")
-parser.add_argument('--perPageEmbeddings', choices=["True", "False"], default="False")
-# Parse the arguments
-args = parser.parse_args()
-
+import sys
 
 def add_trailing_slash(path):
     if not path.endswith('/'):
         path += '/'
     return path
 
+# Argument Parser
+parser = argparse.ArgumentParser()
+
+def print_help_and_exit():
+    parser.print_help()
+    sys.exit(0)
+
+# Define the FAISS store name
+parser.add_argument('--vstoreName', type=str, default='Book_Collection', help='Name of the FAISS store.')
+# Specify the directory to store the FAISS index
+parser.add_argument('--vstoreDir', type=str, default='faiss_store', help='Directory to store FAISS index.')
+# Define the directory containing PDF files
+parser.add_argument('--pdfDir', type=str, default='pdf', help='Directory containing PDF files.')
+# Specify the path to load the model
+parser.add_argument('--modelPath', type=str, default='all-MiniLM-L6-v2/', help='Path to load model.')
+# Run on CPU
+parser.add_argument('--cpu', choices=["True", "False"], default="False", help='Run on CPU.')
+# Use per-page embeddings
+parser.add_argument('--perPageEmbeddings', choices=["True", "False"], default="False", help='Use per-page embeddings.')
+# Call for help
+# Parse the arguments
+args = parser.parse_args()
+
 # Assign the values to the variables
 vstoreName = add_trailing_slash(args.vstoreName)
 vstoreDir = add_trailing_slash(args.vstoreDir)
 vstorePath = vstoreDir+vstoreName
 pdfDir = add_trailing_slash(args.pdfDir)
-model_load_path = args.model_load_path
+modelPath = args.modelPath
 perPageEmbeddings = args.perPageEmbeddings
 cpu = args.cpu
+help = args.help
+
+if help:
+    print_help_and_exit()
 
 if cpu:
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
-    def __init__(self, model_load_path: str):
-        self.model = SentenceTransformer(model_load_path)
+    def __init__(self, modelPath: str):
+        self.model = SentenceTransformer(modelPath)
 
     def embed_query(self, query: str):
         if cpu: 
@@ -58,7 +73,7 @@ class SentenceTransformerEmbeddings(Embeddings):
 torch.set_default_device('cpu')
 
 # Create custom embeddings object
-embeddings = SentenceTransformerEmbeddings(model_load_path=model_load_path)
+embeddings = SentenceTransformerEmbeddings(modelPath=modelPath)
 
 # Create the FAISS index
 index = faiss.IndexFlatL2(embeddings.model.get_sentence_embedding_dimension())
@@ -111,6 +126,9 @@ def get_page_text(page):
 
 def add_documents_to_store(pdfDir):
     all_documents = []  # List to store documents with their UUIDs
+    if not os.path.exists(pdfDir):
+        print("Error: PDF directory not found.")
+        print_help_and_exit()
     for file in os.listdir(pdfDir):
         if file.endswith('.pdf'):
             pdfName = file

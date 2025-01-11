@@ -3,26 +3,46 @@
 # Set default values
 vstoreName="Book_Collection"
 vstoreDir="faiss_store"
-model_load_path="all-MiniLM-L6-v2/"
+modelPath="all-MiniLM-L6-v2/"
 cpu="False"
 
 # Parse command-line arguments
-for arg in "$@"; do
-  case $arg in
-    --vstoreName*)
-      vstoreName="${arg#--vstoreName=}"
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --vstoreName)
+      if [[ -n $2 && $2 != -* ]]; then
+        vstoreName="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
       ;;
-    --vstoreDir*)
-      vstoreDir="${arg#--vstoreDir=}"
+    --vstoreDir)
+      if [[ -n $2 && $2 != -* ]]; then
+        vstoreDir="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
       ;;
-    --model_load_path*)
-      model_load_path="${arg#--model_load_path=}"
+    --modelPath)
+      if [[ -n $2 && $2 != -* ]]; then
+        modelPath="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
       ;;
-    --cpu*)
+    --cpu)
       cpu="True"
+      shift
       ;;
   esac
 done
 
 # Run the Python script with arguments
-python3 gradio_langchain_rag_server.py --vstoreName $vstoreName --vstoreDir $vstoreDir --model_load_path $model_load_path --cpu $cpu
+python3 gradio_langchain_rag_server.py \
+  --vstoreName    "$vstoreName" \
+  --vstoreDir    "$vstoreDir" \
+  --modelPath   "$modelPath" \
+  --cpu          "$cpu"
