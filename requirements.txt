@@ -8,3 +8,4 @@ openai
 huggingface
 pypdf
 gradio
+psutil
