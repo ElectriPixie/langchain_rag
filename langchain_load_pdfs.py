@@ -24,18 +24,39 @@ def print_help_and_exit():
     sys.exit(0)
 
 # Define the FAISS store name
-parser.add_argument('--vstoreName', type=str, default='Book_Collection', help='Name of the FAISS store.')
+parser.add_argument('--vstoreName',
+                    type=str,
+                    default='Book_Collection',
+                    help='Vector store name: The name of the vector store. This is used to identify the vector store.')
+
 # Specify the directory to store the FAISS index
-parser.add_argument('--vstoreDir', type=str, default='faiss_store', help='Directory to store FAISS index.')
+parser.add_argument('--vstoreDir',
+                    type=str,
+                    default='faiss_store/',
+                    help='Vector store directory: The directory where the vector store is located.')
+
 # Define the directory containing PDF files
-parser.add_argument('--pdfDir', type=str, default='pdf', help='Directory containing PDF files.')
+parser.add_argument('--pdfDir',
+                    type=str,
+                    default='pdf',
+                    help='PDF directory: The directory containing PDF files.')
+
 # Specify the path to load the model
-parser.add_argument('--modelPath', type=str, default='all-MiniLM-L6-v2/', help='Path to load model.')
+parser.add_argument('--modelPath',
+                    type=str,
+                    default='all-MiniLM-L6-v2/',
+                    help='Model path: The path to the model to be used. This is used to load the model.')
+
 # Run on CPU
-parser.add_argument('--cpu', choices=["True", "False"], default="False", help='Run on CPU.')
+parser.add_argument('--cpu',
+                    action='store_true',
+                    help='Device: Use CPU instead of GPU (default). This is used to specify the device to use.')
+
 # Use per-page embeddings
-parser.add_argument('--perPageEmbeddings', choices=["True", "False"], default="False", help='Use per-page embeddings.')
-# Parse the arguments
+parser.add_argument('--perPageEmbeddings',
+                    choices=["True", "False"],
+                    default="False",
+                    help='Per-page embeddings: Specify whether to use per-page embeddings. This can improve the accuracy of the model.')
 args = parser.parse_args()
 
 # Assign the values to the variables

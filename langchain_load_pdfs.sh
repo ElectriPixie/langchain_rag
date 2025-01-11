@@ -56,6 +56,10 @@ while [[ $# -gt 0 ]]; do
       help="True"
       shift
       ;;
+    -h)
+      help="True"
+      shift
+      ;;
     *)
       echo "Unknown argument: $1"
       exit 1
@@ -70,5 +74,5 @@ python3 langchain_load_pdfs.py \
   --pdfDir       "$pdfDir"     \
   --model_load_path "$model_load_path" \
   --perPageEmbeddings "$perPageEmbeddings" \
-  --cpu          "$cpu"         \
-  --help         "$help"
+  $([ "$cpu" = "True" ] && echo "--cpu") \
+  $([ "$help" = "True" ] && echo "--help")
