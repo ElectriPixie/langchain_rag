@@ -6,6 +6,7 @@ vstoreDir="faiss_store"
 pdfDir="pdf"
 model_load_path="all-MiniLM-L6-v2/"
 cpu="False"
+perPageEmbeddings="False"
 
 # Parse command-line arguments
 for arg in "$@"; do
@@ -22,6 +23,9 @@ for arg in "$@"; do
     --model_load_path*)
       model_load_path="${arg#--model_load_path=}"
       ;;
+    --perPageEmbeddings*)
+      perPageEmbeddings="True"
+      ;;
     --cpu*)
       cpu="True"
       ;;
@@ -29,4 +33,4 @@ for arg in "$@"; do
 done
 
 # Run the Python script with arguments
-python3 langchain_load_pdfs.py --vstoreName $vstoreName --vstoreDir $vstoreDir --pdfDir $pdfDir --model_load_path $model_load_path --cpu $cpu
+python3 langchain_load_pdfs.py --vstoreName $vstoreName --vstoreDir $vstoreDir --pdfDir $pdfDir --model_load_path $model_load_path --perPageEmbeddings $perPageEmbeddings --cpu $cpu
