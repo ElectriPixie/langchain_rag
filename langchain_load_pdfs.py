@@ -35,7 +35,6 @@ parser.add_argument('--modelPath', type=str, default='all-MiniLM-L6-v2/', help='
 parser.add_argument('--cpu', choices=["True", "False"], default="False", help='Run on CPU.')
 # Use per-page embeddings
 parser.add_argument('--perPageEmbeddings', choices=["True", "False"], default="False", help='Use per-page embeddings.')
-# Call for help
 # Parse the arguments
 args = parser.parse_args()
 
