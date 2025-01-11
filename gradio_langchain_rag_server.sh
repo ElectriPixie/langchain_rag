@@ -5,6 +5,7 @@ vstoreName="Book_Collection"
 vstoreDir="faiss_store"
 modelPath="all-MiniLM-L6-v2/"
 cpu="False"
+help="False"
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
@@ -37,6 +38,18 @@ while [[ $# -gt 0 ]]; do
       cpu="True"
       shift
       ;;
+          --help)
+      help="True"
+      shift
+      ;;
+    -h)
+      help="True"
+      shift
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
   esac
 done
 
@@ -45,4 +58,5 @@ python3 gradio_langchain_rag_server.py \
   --vstoreName    "$vstoreName" \
   --vstoreDir    "$vstoreDir" \
   --modelPath   "$modelPath" \
-  --cpu          "$cpu"
+  $([ "$cpu" = "True" ] && echo "--cpu") \
+  $([ "$help" = "True" ] && echo "--help")
