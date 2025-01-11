@@ -67,10 +67,6 @@ pdfDir = add_trailing_slash(args.pdfDir)
 modelPath = args.modelPath
 perPageEmbeddings = args.perPageEmbeddings
 cpu = args.cpu
-help = args.help
-
-if help:
-    print_help_and_exit()
 
 if cpu:
     os.environ["CUDA_VISIBLE_DEVICES"] = ""

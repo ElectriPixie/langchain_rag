@@ -4,7 +4,7 @@
 vstoreName="Book_Collection"
 vstoreDir="faiss_store"
 pdfDir="pdf"
-model_load_path="all-MiniLM-L6-v2/"
+modelPath="all-MiniLM-L6-v2/"
 cpu="False"
 perPageEmbeddings="False"
 help="False"
@@ -36,9 +36,9 @@ while [[ $# -gt 0 ]]; do
         shift # Skip invalid value, keep default
       fi
       ;;
-    --model_load_path)
+    --modelPath)
       if [[ -n $2 && $2 != -* ]]; then
-        model_load_path="$2"
+        modelPath="$2"
         shift 2
       else
         shift # Skip invalid value, keep default
@@ -72,7 +72,7 @@ python3 langchain_load_pdfs.py \
   --vstoreName    "$vstoreName"  \
   --vstoreDir    "$vstoreDir"  \
   --pdfDir       "$pdfDir"     \
-  --model_load_path "$model_load_path" \
+  --modelPath "$modelPath" \
   --perPageEmbeddings "$perPageEmbeddings" \
   $([ "$cpu" = "True" ] && echo "--cpu") \
   $([ "$help" = "True" ] && echo "--help")
