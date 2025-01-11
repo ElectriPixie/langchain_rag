@@ -28,6 +28,10 @@ while [[ $# -gt 0 ]]; do
       help="True"
       shift
       ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
   esac
 done
 
