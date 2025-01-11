@@ -18,6 +18,7 @@ parser.add_argument('--vstoreDir', type=str, default='faiss_store')
 parser.add_argument('--pdfDir', type=str, default='pdf')
 parser.add_argument('--model_load_path', type=str, default='all-MiniLM-L6-v2/')
 parser.add_argument("--cpu", choices=["True", "False"], default="False")
+parser.add_argument('--perPageEmbeddings', choices=["True", "False"], default="False")
 # Parse the arguments
 args = parser.parse_args()
 
@@ -33,6 +34,7 @@ vstoreDir = add_trailing_slash(args.vstoreDir)
 vstorePath = vstoreDir+vstoreName
 pdfDir = add_trailing_slash(args.pdfDir)
 model_load_path = args.model_load_path
+perPageEmbeddings = args.perPageEmbeddings
 cpu = args.cpu
 
 if cpu:
@@ -94,7 +96,19 @@ def document_to_dict(doc):
         print(f"Document structure: {doc}")
         return {'text': str(doc), 'metadata': None}  # Fallback to string conversion
 
-# Function to add documents to the FAISS index and the document store
+def get_page_text(page):
+    if hasattr(page, 'text'):
+        return page.text
+    elif hasattr(page, 'content'):
+        return page.content
+    elif hasattr(page, 'page_content'):
+        return page.page_content
+    elif hasattr(page, 'raw_text'):
+        return page.raw_text
+    else:
+        print(f"Document structure: {page}")
+        return str(page)
+
 def add_documents_to_store(pdfDir):
     all_documents = []  # List to store documents with their UUIDs
     for file in os.listdir(pdfDir):
@@ -104,19 +118,28 @@ def add_documents_to_store(pdfDir):
 
             file_path = os.path.join(pdfDir, pdfName)
             loader = PyPDFLoader(file_path)
-            pages = []
-            for page in loader.lazy_load():
-                pages.append(page)
+            if perPageEmbeddings:
+                pages = list(loader.lazy_load())
+                # Create UUIDs for the documents
+                uuids = [str(uuid4()) for _ in pages]
+                
+                # Add documents to FAISS index
+                vector_store.add_documents(documents=pages, ids=uuids)
 
-            # Create UUIDs for the documents
-            uuids = [str(uuid4()) for _ in range(len(pages))]
-            
-            # Add documents to FAISS index
-            vector_store.add_documents(documents=pages, ids=uuids)
+                # Store documents and their UUIDs for saving
+                for uuid, page in zip(uuids, pages):
+                    all_documents.append({"uuid": uuid, "content": page})
+            else:
+                whole_document = loader.text
+                # Create UUIDs for the documents
+                uuids = [str(uuid4())]
+                
+                # Add documents to FAISS index
+                vector_store.add_documents(documents=[whole_document], ids=uuids)
 
-            # Store documents and their UUIDs for saving
-            for uuid, page in zip(uuids, pages):
-                all_documents.append({"uuid": uuid, "content": page})
+                # Store documents and their UUIDs for saving
+                for uuid, page in zip(uuids, [whole_document]):
+                    all_documents.append({"uuid": uuid, "content": page})
 
     return all_documents
 
