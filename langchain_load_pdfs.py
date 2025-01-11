@@ -134,15 +134,7 @@ vector_store = FAISS(
 
 # Function to extract text content from a Document object
 def document_to_dict(doc):
-    """
-    Converts a Document object to a dictionary for serialization.
-    
-    Args:
-    - doc: The Document object to convert.
-    
-    Returns:
-    - dict: A dictionary representing the Document object.
-    """
+# Converts a Document object to a dictionary for serialization.
     # Check for possible attributes that might hold the text
     if hasattr(doc, 'text'):
         return {'text': doc.text, 'metadata': doc.metadata}
