@@ -12,10 +12,25 @@ import argparse
 parser = argparse.ArgumentParser()
 
 # Define the arguments
-parser.add_argument('--vstoreName', type=str, default='Book_Collection')
-parser.add_argument('--vstoreDir', type=str, default='faiss_store/')
-parser.add_argument('--modelPath', type=str, default='all-MiniLM-L6-v2/')
-parser.add_argument("--cpu", choices=["True", "False"], default="False")
+parser.add_argument('--vstoreName',
+                    type=str,
+                    default='Book_Collection',
+                    help='Vector store name: The name of the vector store. This is used to identify the vector store.')
+
+parser.add_argument('--vstoreDir',
+                    type=str,
+                    default='faiss_store/',
+                    help='Vector store directory: The directory where the vector store is located.')
+
+parser.add_argument('--modelPath',
+                    type=str,
+                    default='all-MiniLM-L6-v2/',
+                    help='Model path: The path to the model to be used. This is used to load the model.')
+
+parser.add_argument('--cpu',
+                    action='store_true',
+                    help='Device: Use CPU instead of GPU (default). This is used to specify the device to use.')
+
 # Parse the arguments
 args = parser.parse_args()
 

@@ -5,6 +5,7 @@ vstoreName="Book_Collection"
 vstoreDir="faiss_store/"
 modelPath="all-MiniLM-L6-v2/"
 cpu="False"
+help="False"
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
@@ -37,6 +38,14 @@ while [[ $# -gt 0 ]]; do
       cpu="True"
       shift
       ;;
+    --help)
+      help="True"
+      shift
+      ;;
+    -h)
+      help="True"
+      shift
+      ;;
   esac
 done
 
@@ -45,4 +54,5 @@ python3 langchain_initialize_faiss.py \
   --vstoreName    "$vstoreName" \
   --vstoreDir    "$vstoreDir" \
   --modelPath "$modelPath" \
-  --cpu          "$cpu"
+  $([ "$cpu" = "True" ] && echo "--cpu") \
+  $([ "$help" = "True" ] && echo "--help")
