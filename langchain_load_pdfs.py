@@ -170,53 +170,73 @@ def get_page_text(page):
         print(f"Document structure: {page}")
         return str(page)
 
-def add_documents_to_store(pdfDir):
-    all_documents = []  # List to store documents with their UUIDs
+def load_existing_uuids_from_json(json_file):
+    #Load UUIDs from the documents JSON file for fast lookup
+    json_file = vstorePath+json_file
+    if os.path.exists(json_file):
+        try:
+            with open(json_file, 'r') as file:
+                # Load the JSON data
+                data = json.load(file)
+
+                # Ensure data is a dictionary where the keys are UUIDs
+                if isinstance(data, dict):
+                    # Extract the UUIDs from the keys of the dictionary
+                    return set(data.keys())
+                else:
+                    raise ValueError(f"Invalid JSON structure in {json_file}: Expected a dictionary with UUID keys")
+        except (json.JSONDecodeError, ValueError) as e:
+            # Handle invalid JSON format or structure gracefully
+            print(f"Error loading JSON file {json_file}: {e}")
+            return set()  # Return an empty set in case of error
+    return set()  # Return an empty set if the file doesn't exist
+
+def add_documents_to_store(pdfDir, json_file='documents.json'):
+    all_documents = [] # List to store documents with their UUIDs
+
     if not os.path.exists(pdfDir):
         print("Error: PDF directory not found.")
         print_help_and_exit()
+    existing_uuids = load_existing_uuids_from_json(json_file)
+
     for file in os.listdir(pdfDir):
         if file.endswith('.pdf'):
             pdfName = file
-            print("Loading: " + pdfName)
 
-            file_path = os.path.join(pdfDir, pdfName)
+            file_path = os.path.join(pdfDir, file)
             loader = PyPDFLoader(file_path)
-            if perPageEmbeddings:
-                pages = list(loader.lazy_load())
-                # Create UUIDs for the documents
-                uuids = [str(uuid4()) for _ in pages]
-                
-                # Add documents to FAISS index
-                vector_store.add_documents(documents=pages, ids=uuids)
+            pages = list(loader.lazy_load())  # Get the pages from the PDF file
+            uuids = [file.replace('.pdf', '').replace('/', '_') + f"_{i}" for i, _ in enumerate(pages)]
+            if uuids[0] in existing_uuids:
+                print(f"Skipping: {pdfName}")
+            else:
+                print(f"Loading: {pdfName}")
+                if perPageEmbeddings:
+                    # Add documents to FAISS index
+                    vector_store.add_documents(documents=pages, ids=uuids)
+                else:
+                    whole_document = '\n'.join(pages)  # Join the pages into a single document
+                    # Add document to FAISS index
+                    vector_store.add_document(document=whole_document, id=uuids[0])
 
                 # Store documents and their UUIDs for saving
                 for uuid, page in zip(uuids, pages):
                     all_documents.append({"uuid": uuid, "content": page})
-            else:
-                whole_document = loader.text
-                # Create UUIDs for the documents
-                uuids = [str(uuid4())]
-                
-                # Add documents to FAISS index
-                vector_store.add_documents(documents=[whole_document], ids=uuids)
-
-                # Store documents and their UUIDs for saving
-                for uuid, page in zip(uuids, [whole_document]):
-                    all_documents.append({"uuid": uuid, "content": page})
-
     return all_documents
+
 
 # Add documents to the vector store and retrieve document content
 all_documents = add_documents_to_store(pdfDir)
+if all_documents:
+    # Save the FAISS index directly
+    faiss.write_index(index, os.path.join(vstorePath, f"index.faiss"))
 
-# Save the FAISS index directly
-faiss.write_index(index, os.path.join(vstorePath, f"index.faiss"))
+    # Save the document store (in memory)
+    docstore_data = {doc["uuid"]: document_to_dict(doc["content"]) for doc in all_documents}
 
-# Save the document store (in memory)
-docstore_data = {doc["uuid"]: document_to_dict(doc["content"]) for doc in all_documents}
+    with open(os.path.join(vstorePath, f"documents.json"), "w") as doc_file:
+        json.dump(docstore_data, doc_file)
 
-with open(os.path.join(vstorePath, f"documents.json"), "w") as doc_file:
-    json.dump(docstore_data, doc_file)
-
-print(f"Documents and FAISS index saved to {vstorePath}")
+    print(f"Documents and FAISS index saved to {vstorePath}")
+else:
+    print(f"No Documents saved to {vstorePath}")
