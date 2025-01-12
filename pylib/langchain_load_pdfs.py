@@ -87,11 +87,6 @@ parser.add_argument('--pdfDir',
                     default=DEFAULT_PDF_DIR,
                     help='PDF directory: The directory containing PDF files.')
 
-# Use per-page embeddings
-parser.add_argument('--perPageEmbeddings',
-                    action='store_true',
-                    help='Per-page embeddings: Specify whether to use per-page embeddings. This can improve the accuracy of the model.')
-
 # Define the device to use (CPU or GPU)
 parser.add_argument('--gpu',
                     action='store_true',
@@ -120,7 +115,6 @@ if args.pdfDir is not DEFAULT_PDF_DIR:
 else:
     pdfDir = add_trailing_slash(DEFAULT_PATH+args.pdfDir)
 gpu = args.gpu
-perPageEmbeddings = args.perPageEmbeddings
 vstorePath=vstoreDir+vstoreName
 
 if not gpu:
@@ -229,13 +223,8 @@ def add_documents_to_store(pdfDir, json_file='documents.json'):
                 print(f"Skipping: {pdfName}")
             else:
                 print(f"Loading: {pdfName}")
-                if perPageEmbeddings:
-                    # Add documents to FAISS index
-                    vector_store.add_documents(documents=pages, ids=uuids)
-                else:
-                    whole_document = '\n'.join(pages)  # Join the pages into a single document
-                    # Add document to FAISS index
-                    vector_store.add_document(document=whole_document, id=uuids[0])
+                # Add documents to FAISS index
+                vector_store.add_documents(documents=pages, ids=uuids)
 
                 # Store documents and their UUIDs for saving
                 for uuid, page in zip(uuids, pages):
