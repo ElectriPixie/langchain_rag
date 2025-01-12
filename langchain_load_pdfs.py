@@ -82,11 +82,6 @@ parser.add_argument('--cpu',
                     action='store_true',
                     help='Device: Use CPU instead of GPU (default). This is used to specify the device to use.')
 
-# Use per-page embeddings
-parser.add_argument('--perPageEmbeddings',
-                    choices=["True", "False"],
-                    default="False",
-                    help='Per-page embeddings: Specify whether to use per-page embeddings. This can improve the accuracy of the model.')
 args = parser.parse_args()
 
 # Assign the values to the variables
@@ -95,11 +90,13 @@ vstoreDir = add_trailing_slash(args.vstoreDir)
 vstorePath = vstoreDir+vstoreName
 pdfDir = add_trailing_slash(args.pdfDir)
 modelPath = args.modelPath
-perPageEmbeddings = args.perPageEmbeddings
 cpu = args.cpu
 
 if cpu:
+    # Set default device to CPU
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    torch.set_default_device('cpu')
+
 
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
@@ -114,9 +111,6 @@ class SentenceTransformerEmbeddings(Embeddings):
 
     def embed_documents(self, documents: list):
         return [self.embed_query(doc) for doc in documents]
-
-# Set default device to CPU
-torch.set_default_device('cpu')
 
 # Create custom embeddings object
 embeddings = SentenceTransformerEmbeddings(modelPath=modelPath)
@@ -203,14 +197,7 @@ def add_documents_to_store(pdfDir, json_file='documents.json'):
                 print(f"Skipping: {pdfName}")
             else:
                 print(f"Loading: {pdfName}")
-                if perPageEmbeddings:
-                    # Add documents to FAISS index
-                    vector_store.add_documents(documents=pages, ids=uuids)
-                else:
-                    whole_document = '\n'.join(pages)  # Join the pages into a single document
-                    # Add document to FAISS index
-                    vector_store.add_document(document=whole_document, id=uuids[0])
-
+                vector_store.add_documents(documents=pages, ids=uuids)
                 # Store documents and their UUIDs for saving
                 for uuid, page in zip(uuids, pages):
                     all_documents.append({"uuid": uuid, "content": page})
