@@ -76,6 +76,6 @@ python3 ${DEFAULT_PATH}/pylib/langchain_load_pdfs.py \
   --vstoreDir    "$vstoreDir"  \
   --pdfDir       "$pdfDir"     \
   --modelPath "$modelPath" \
-  --perPageEmbeddings "$perPageEmbeddings" \
+  $([ "$perPageEmbeddings" = "True" ] && echo "--perPageEmbeddings") \
   $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")
