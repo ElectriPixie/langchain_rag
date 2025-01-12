@@ -68,13 +68,9 @@ if args.modelDir is not DEFAULT_MODEL_NAME:
     modelDir = add_trailing_slash(args.modelDir)
 else:
    modelDir = add_trailing_slash(DEFAULT_PATH+args.modelDir)
-
-if args.modelName is not DEFAULT_MODEL_NAME:
-    modelName = add_trailing_slash(args.modelName)
-else:
-   modelName = add_trailing_slash(DEFAULT_PATH+args.modelName)
-modelPath = modelDir+modelName
+modelName = args.modelName
 gpu = args.gpu
+modelPath = modelDir+modelName
 
 if not gpu:
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
