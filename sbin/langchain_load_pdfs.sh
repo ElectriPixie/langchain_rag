@@ -7,7 +7,8 @@ DEFAULT_PATH=$(dirname $SCRIPT_DIR)
 vstoreName="Book_Collection"
 vstoreDir="faiss_store"
 pdfDir="pdf"
-modelPath="all-MiniLM-L6-v2"
+modelName="all-MiniLM-L6-v2"
+modelDir="models"
 gpu="False"
 help="False"
 
@@ -38,9 +39,17 @@ while [[ $# -gt 0 ]]; do
         shift # Skip invalid value, keep default
       fi
       ;;
-    --modelPath)
+    --modelDir)
       if [[ -n $2 && $2 != -* ]]; then
-        modelPath="$2"
+        modelDir="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
+      ;;
+    --modelName)
+      if [[ -n $2 && $2 != -* ]]; then
+        modelName="$2"
         shift 2
       else
         shift # Skip invalid value, keep default
@@ -50,11 +59,7 @@ while [[ $# -gt 0 ]]; do
       gpu="True"
       shift
       ;;
-    --help)
-      help="True"
-      shift
-      ;;
-    -h)
+    -h|--help)
       help="True"
       shift
       ;;
@@ -70,6 +75,7 @@ python3 ${DEFAULT_PATH}/pylib/langchain_load_pdfs.py \
   --vstoreName    "$vstoreName"  \
   --vstoreDir    "$vstoreDir"  \
   --pdfDir       "$pdfDir"     \
-  --modelPath "$modelPath" \
+  --modelDir   "$modelDir" \
+  --modelName   "$modelName" \
   $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")

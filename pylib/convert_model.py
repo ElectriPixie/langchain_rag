@@ -11,6 +11,7 @@ def add_trailing_slash(path):
 
 SCRIPT_DIR = os.path.dirname(__file__)
 DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
+DEFAULT_MODEL_DIR="models"
 DEFAULT_MODEL_NAME="all-MiniLM-L6-v2"
 
 # Get the parent process ID
@@ -45,6 +46,11 @@ else:
 parser = argparse.ArgumentParser(prog=prog_name)
 
 # Add a command-line argument for the model name
+parser.add_argument('--modelDir',
+                    type=str,
+                    default=DEFAULT_MODEL_DIR,
+                    help='Model dir: The directory to store models.')
+
 parser.add_argument('--modelName', 
                     type=str, 
                     default=DEFAULT_MODEL_NAME, 
@@ -55,19 +61,23 @@ parser.add_argument("--gpu",
                     action='store_true', 
                     help='Device: Run on GPU instead of CPU. (Default: CPU)')
 
+
 args = parser.parse_args()
-if args.modelName is not DEFAULT_MODEL_NAME:
-    modelName = add_trailing_slash(args.modelName)
+
+if args.modelDir is not DEFAULT_MODEL_NAME:
+    modelDir = add_trailing_slash(args.modelDir)
 else:
-   modelName = add_trailing_slash(DEFAULT_PATH+args.modelName)
+   modelDir = add_trailing_slash(DEFAULT_PATH+args.modelDir)
+modelName = args.modelName
 gpu = args.gpu
+modelPath = modelDir+modelName
 
 if not gpu:
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Load the pre-trained model
-model = SentenceTransformer(args.modelName)
+model = SentenceTransformer(modelName)
 
 # Save the model's config and state_dict
-model.save(modelName)
-print(f"Model saved to {modelName}")
+model.save(modelPath)
+print(f"Model saved to {modelPath}")
