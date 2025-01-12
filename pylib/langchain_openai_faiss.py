@@ -24,7 +24,8 @@ SCRIPT_DIR = os.path.dirname(__file__)
 DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
 DEFAULT_VSTORE_NAME="Book_Collection"
 DEFAULT_VSTORE_DIR="faiss_store"
-DEFAULT_MODEL_PATH="all-MiniLM-L6-v2"
+DEFAULT_MODEL_DIR="models"
+DEFAULT_MODEL_NAME="all-MiniLM-L6-v2"
 
 # set True to skip to general knowlege when no documents are found
 skipToGeneralKnowlege = 1
@@ -71,11 +72,15 @@ parser.add_argument('--vstoreDir',
                     default=DEFAULT_VSTORE_DIR,
                     help='Vector store directory: The directory where the vector store is located.')
 
-# Define the path to the model to be used
-parser.add_argument('--modelPath',
+parser.add_argument('--modelDir',
                     type=str,
-                    default=DEFAULT_MODEL_PATH,
-                    help='Model path: The path to the model to be used. This is used to load the model.')
+                    default=DEFAULT_MODEL_DIR,
+                    help='Model dir: The directory to store models. This is used to load the model')
+
+parser.add_argument('--modelName', 
+                    type=str, 
+                    default=DEFAULT_MODEL_NAME, 
+                    help='Model name: The name of the model to be used. This is used to load the model. (e.g. "all-MiniLM-L6-v2")')
 
 # Define the device to use (CPU or GPU)
 parser.add_argument('--gpu',
@@ -95,12 +100,19 @@ if args.vstoreDir is not DEFAULT_VSTORE_DIR:
 else:
    vstore = add_trailing_slash(DEFAULT_PATH+args.vstoreDir)
 
-if args.modelPath is not DEFAULT_MODEL_PATH:
-    modelPath = add_trailing_slash(args.modelPath)
+if args.modelDir is not DEFAULT_MODEL_NAME:
+    modelDir = add_trailing_slash(args.modelDir)
 else:
-    modelPath = add_trailing_slash(DEFAULT_PATH+args.modelPath)
+   modelDir = add_trailing_slash(DEFAULT_PATH+args.modelDir)
+
+if args.modelName is not DEFAULT_MODEL_NAME:
+    modelName = add_trailing_slash(args.modelName)
+else:
+   modelName = add_trailing_slash(DEFAULT_PATH+args.modelName)
+
 gpu = args.gpu
 vstorePath=vstoreDir+vstoreName
+modelPath = modelDir+modelName
 
 if not gpu:
     # Set default device to CPU
