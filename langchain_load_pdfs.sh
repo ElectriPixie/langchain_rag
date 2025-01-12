@@ -6,7 +6,6 @@ vstoreDir="faiss_store"
 pdfDir="pdf"
 modelPath="all-MiniLM-L6-v2/"
 cpu="False"
-perPageEmbeddings="False"
 help="False"
 
 # Parse command-line arguments
@@ -44,10 +43,6 @@ while [[ $# -gt 0 ]]; do
         shift # Skip invalid value, keep default
       fi
       ;;
-    --perPageEmbeddings)
-      perPageEmbeddings="True"
-      shift
-      ;;
     --cpu)
       cpu="True"
       shift
@@ -73,6 +68,5 @@ python3 langchain_load_pdfs.py \
   --vstoreDir    "$vstoreDir"  \
   --pdfDir       "$pdfDir"     \
   --modelPath "$modelPath" \
-  --perPageEmbeddings "$perPageEmbeddings" \
   $([ "$cpu" = "True" ] && echo "--cpu") \
   $([ "$help" = "True" ] && echo "--help")
