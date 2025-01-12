@@ -15,6 +15,20 @@ from langchain.schema import Document
 import argparse
 import psutil
 
+def add_trailing_slash(path):
+    if not path.endswith('/'):
+        path += '/'
+    return path
+
+SCRIPT_DIR = os.path.dirname(__file__)
+DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
+DEFAULT_VSTORE_NAME="Book_Collection"
+DEFAULT_VSTORE_DIR="faiss_store"
+DEFAULT_MODEL_PATH="all-MiniLM-L6-v2"
+
+# set True to skip to general knowlege when no documents are found
+skipToGeneralKnowlege = 1
+
 # Get the parent process ID
 parent_pid = os.getppid()
 
@@ -45,47 +59,53 @@ else:
 
 parser = argparse.ArgumentParser(prog=prog_name)
 
-# Define the FAISS store name
+# Define the name of the vector store
 parser.add_argument('--vstoreName',
                     type=str,
-                    default='Book_Collection',
+                    default=DEFAULT_VSTORE_NAME,
                     help='Vector store name: The name of the vector store. This is used to identify the vector store.')
 
-# Specify the directory to store the FAISS index
+# Define the directory where the vector store is located
 parser.add_argument('--vstoreDir',
                     type=str,
-                    default='faiss_store/',
+                    default=DEFAULT_VSTORE_DIR,
                     help='Vector store directory: The directory where the vector store is located.')
 
-# Specify the path to load the model
+# Define the path to the model to be used
 parser.add_argument('--modelPath',
                     type=str,
-                    default='all-MiniLM-L6-v2/',
+                    default=DEFAULT_MODEL_PATH,
                     help='Model path: The path to the model to be used. This is used to load the model.')
 
-# Run on CPU
-parser.add_argument('--cpu',
+# Define the device to use (CPU or GPU)
+parser.add_argument('--gpu',
                     action='store_true',
-                    help='Device: Use CPU instead of GPU (default). This is used to specify the device to use.')
+                    help='Device: Use GPU instead of CPU (default). This is used to specify the device to use.')
 
 # Parse the arguments
 args = parser.parse_args()
 
-def add_trailing_slash(path):
-    if not path.endswith('/'):
-        path += '/'
-    return path
+if args.vstoreName is not DEFAULT_VSTORE_NAME:
+    vstoreName = add_trailing_slash(args.vstoreName)
+else:
+   vstoreName = add_trailing_slash(DEFAULT_PATH+args.vstoreName)
 
-# Assign the values to the variables
-skipToGeneralKnowlege = 1
-vstoreName = add_trailing_slash(args.vstoreName)
-vstoreDir = add_trailing_slash(args.vstoreDir)
-vstorePath = vstoreDir+vstoreName
-modelPath = args.modelPath
-cpu = args.cpu
+if args.vstoreDir is not DEFAULT_VSTORE_DIR:
+    vstoreDir = add_trailing_slash(args.vstoreDir)
+else:
+   vstore = add_trailing_slash(DEFAULT_PATH+args.vstoreDir)
 
-if cpu:
+if args.modelPath is not DEFAULT_MODEL_PATH:
+    modelPath = add_trailing_slash(args.modelPath)
+else:
+    modelPath = add_trailing_slash(DEFAULT_PATH+args.modelPath)
+gpu = args.gpu
+vstorePath=vstoreDir+vstoreName
+
+if not gpu:
+    # Set default device to CPU
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    torch.set_default_device('cpu')
 
 
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
@@ -94,19 +114,15 @@ class SentenceTransformerEmbeddings(Embeddings):
         self.model = SentenceTransformer(modelPath)
 
     def embed_query(self, query: str):
-        if cpu: 
-            return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
-        else:
+        if gpu: 
             return self.model.encode([query], convert_to_tensor=True)[0].numpy()
+        else:
+            return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
 
     def embed_documents(self, documents: list):
         return [self.embed_query(doc) for doc in documents]
 
-# Set default device to CPU
-torch.set_default_device('cpu')
-#torch.cuda.empty_cache()
-
-# Paths and settings
+# Chat interface settings
 user = "User: "
 chatmodel = "\nLlama-RAG - "
 bright = Style.BRIGHT 
@@ -119,8 +135,9 @@ ragtext = reset+bright+Fore.CYAN
 
 # Create custom embeddings object and load the saved model weights (embeddings.pt)
 embeddings = SentenceTransformerEmbeddings(modelPath=modelPath)
-if cpu:
-    embeddings.model.to('cpu')
+
+#if not gpu:
+    #embeddings.model.to('cpu')
 
 # Load documents from the JSON file
 try:
@@ -201,13 +218,7 @@ def chatFunc(message):
     
     # Get response from the chat model
     response = chat.invoke(messages)
-    #if 'confidence' in response:
-    #    confidence = response['confidence']
-    #else:
-    #    confidence = "None"
-    #print("Confidence: "+confidence)
     if response.content == 'NA' or response.content == "Not found in current context.":
-        #print("context_response: "+response.content)
         knowledge_base = "General Knowledge: \n"
         messages = [
             SystemMessage(

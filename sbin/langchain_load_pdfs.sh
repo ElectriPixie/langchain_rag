@@ -1,11 +1,14 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
+DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+
 # Set default values
 vstoreName="Book_Collection"
 vstoreDir="faiss_store"
 pdfDir="pdf"
-modelPath="all-MiniLM-L6-v2/"
-cpu="False"
+modelPath="all-MiniLM-L6-v2"
+gpu="False"
 perPageEmbeddings="False"
 help="False"
 
@@ -48,8 +51,8 @@ while [[ $# -gt 0 ]]; do
       perPageEmbeddings="True"
       shift
       ;;
-    --cpu)
-      cpu="True"
+    --gpu)
+      gpu="True"
       shift
       ;;
     --help)
@@ -68,11 +71,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 langchain_load_pdfs.py \
+python3 ${DEFAULT_PATH}/pylib/langchain_load_pdfs.py \
   --vstoreName    "$vstoreName"  \
   --vstoreDir    "$vstoreDir"  \
   --pdfDir       "$pdfDir"     \
   --modelPath "$modelPath" \
-  --perPageEmbeddings "$perPageEmbeddings" \
-  $([ "$cpu" = "True" ] && echo "--cpu") \
+  $([ "$perPageEmbeddings" = "True" ] && echo "--perPageEmbeddings") \
+  $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")

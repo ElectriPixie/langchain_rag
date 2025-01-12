@@ -1,8 +1,11 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
+DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+
 # Set default values
 modelName="all-MiniLM-L6-v2"
-cpu="False"
+gpu="False"
 help="False"
 
 # Parse command-line arguments
@@ -16,8 +19,8 @@ while [[ $# -gt 0 ]]; do
         shift # Skip invalid value, keep default
       fi
       ;;
-    --cpu)
-      cpu="True"
+    --gpu)
+      gpu="True"
       shift
       ;;
     --help)
@@ -36,7 +39,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 convert_model.py \
+python3 ${DEFAULT_PATH}/pylib/convert_model.py \
   --modelName "$modelName" \
-  $([ "$cpu" = "True" ] && echo "--cpu") \
+  $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")
