@@ -4,7 +4,14 @@ from sentence_transformers import SentenceTransformer
 import argparse
 import psutil
 
-import psutil
+def add_trailing_slash(path):
+    if not path.endswith('/'):
+        path += '/'
+    return path
+
+SCRIPT_DIR = os.path.dirname(__file__)
+DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
+DEFAULT_MODEL_NAME="all-MiniLM-L6-v2"
 
 # Get the parent process ID
 parent_pid = os.getppid()
@@ -40,25 +47,27 @@ parser = argparse.ArgumentParser(prog=prog_name)
 # Add a command-line argument for the model name
 parser.add_argument('--modelName', 
                     type=str, 
-                    default='all-MiniLM-L6-v2', 
+                    default=DEFAULT_MODEL_NAME, 
                     help='Model name: The name of the model to be used. This is used to load the model. (e.g. "all-MiniLM-L6-v2")')
 
 # Add a command-line flag for the CPU usage
-parser.add_argument("--cpu", 
+parser.add_argument("--gpu", 
                     action='store_true', 
-                    help='Device: Run on CPU instead of GPU. (Default: GPU)')
+                    help='Device: Run on GPU instead of CPU. (Default: CPU)')
 
 args = parser.parse_args()
-modelName = args.modelName
-cpu = args.cpu
+if args.modelName is not DEFAULT_MODEL_NAME:
+    modelName = add_trailing_slash(args.modelName)
+else:
+   modelName = add_trailing_slash(DEFAULT_PATH+args.modelName)
+gpu = args.gpu
 
-if cpu:
+if not gpu:
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 # Load the pre-trained model
 model = SentenceTransformer(args.modelName)
 
 # Save the model's config and state_dict
-model_save_path = modelName
-model.save(model_save_path)
-print(f"Model saved to {model_save_path}")
+model.save(modelName)
+print(f"Model saved to {modelName}")

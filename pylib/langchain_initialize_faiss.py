@@ -9,6 +9,17 @@ from langchain.embeddings.base import Embeddings
 import argparse
 import psutil
 
+def add_trailing_slash(path):
+    if not path.endswith('/'):
+        path += '/'
+    return path
+
+SCRIPT_DIR = os.path.dirname(__file__)
+DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
+DEFAULT_VSTORE_NAME="Book_Collection"
+DEFAULT_VSTORE_DIR="faiss_store"
+DEFAULT_MODEL_PATH="all-MiniLM-L6-v2"
+
 # Get the parent process ID
 parent_pid = os.getppid()
 
@@ -37,48 +48,54 @@ if run_script_base == script_base:
 else:
     prog_name=script_name
 
-parser = argparse.ArgumentParser(prog=prog_name)
-
+parser = argparse.ArgumentParser()
 # Define the name of the vector store
 parser.add_argument('--vstoreName',
                     type=str,
-                    default='Book_Collection',
+                    default=DEFAULT_VSTORE_NAME,
                     help='Vector store name: The name of the vector store. This is used to identify the vector store.')
 
 # Define the directory where the vector store is located
 parser.add_argument('--vstoreDir',
                     type=str,
-                    default='faiss_store/',
+                    default=DEFAULT_VSTORE_DIR,
                     help='Vector store directory: The directory where the vector store is located.')
 
 # Define the path to the model to be used
 parser.add_argument('--modelPath',
                     type=str,
-                    default='all-MiniLM-L6-v2/',
+                    default=DEFAULT_MODEL_PATH,
                     help='Model path: The path to the model to be used. This is used to load the model.')
 
 # Define the device to use (CPU or GPU)
-parser.add_argument('--cpu',
+parser.add_argument('--gpu',
                     action='store_true',
-                    help='Device: Use CPU instead of GPU (default). This is used to specify the device to use.')
+                    help='Device: Use GPU instead of CPU (default). This is used to specify the device to use.')
 
 # Parse the arguments
 args = parser.parse_args()
 
-def add_trailing_slash(path):
-    if not path.endswith('/'):
-        path += '/'
-    return path
+if args.vstoreName is not DEFAULT_VSTORE_NAME:
+    vstoreName = add_trailing_slash(args.vstoreName)
+else:
+   vstoreName = add_trailing_slash(DEFAULT_PATH+args.vstoreName)
 
-# Assign the values to the variables
-vstoreName = add_trailing_slash(args.vstoreName)
-vstoreDir = add_trailing_slash(args.vstoreDir)
-modelPath = args.modelPath
-vstorePath = vstoreDir+vstoreName
-cpu = args.cpu
+if args.vstoreDir is not DEFAULT_VSTORE_DIR:
+    vstoreDir = add_trailing_slash(args.vstoreDir)
+else:
+   vstore = add_trailing_slash(DEFAULT_PATH+args.vstoreDir)
 
-if cpu:
+if args.modelPath is not DEFAULT_MODEL_PATH:
+    modelPath = add_trailing_slash(args.modelPath)
+else:
+    modelPath = add_trailing_slash(DEFAULT_PATH+args.modelPath)
+gpu = args.gpu
+vstorePath=vstoreDir+vstoreName
+
+if not gpu:
+    # Set default device to CPU
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    torch.set_default_device('cpu')
 
 os.makedirs(vstorePath, exist_ok=True)
 
@@ -88,16 +105,14 @@ class SentenceTransformerEmbeddings(Embeddings):
         self.model = SentenceTransformer(modelPath)
 
     def embed_query(self, query: str):
-        if cpu: 
-            return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
-        else:
+        if gpu: 
             return self.model.encode([query], convert_to_tensor=True)[0].numpy()
+        else:
+            return self.model.encode([query], convert_to_tensor=True)[0].cpu().numpy()
 
     def embed_documents(self, documents: list):
         return [self.embed_query(doc) for doc in documents]
 
-# Set default device to CPU
-torch.set_default_device('cpu')
 
 # Create custom embeddings object
 embeddings = SentenceTransformerEmbeddings(modelPath=modelPath)

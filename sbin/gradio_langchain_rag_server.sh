@@ -1,10 +1,13 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
+DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+
 # Set default values
 vstoreName="Book_Collection"
 vstoreDir="faiss_store"
 modelPath="all-MiniLM-L6-v2/"
-cpu="False"
+gpu="False"
 help="False"
 
 # Parse command-line arguments
@@ -34,8 +37,8 @@ while [[ $# -gt 0 ]]; do
         shift # Skip invalid value, keep default
       fi
       ;;
-    --cpu)
-      cpu="True"
+    --gpu)
+      gpu="True"
       shift
       ;;
           --help)
@@ -54,9 +57,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 gradio_langchain_rag_server.py \
+python3 ${DEFAULT_PATH}/pylib/gradio_langchain_rag_server.py \
   --vstoreName    "$vstoreName" \
   --vstoreDir    "$vstoreDir" \
   --modelPath   "$modelPath" \
-  $([ "$cpu" = "True" ] && echo "--cpu") \
+  $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")
