@@ -12,4 +12,3 @@ then run ```./langchain_initialize_faiss.sh``` to initialize the faiss store
 then run ```./langchain_load_pdfs.sh``` to load pdfs into the faiss store
 
 then run either ```./langchain_openai_faiss.sh``` or ```./gradio_langchain_rag_server.sh``` to get an interface to the chatbot with RAG
-
