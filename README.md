@@ -9,7 +9,7 @@ run ```./sbin/convert_model.py``` to save the model for reuse without using unsa
 
 then run ```./sbin/langchain_initialize_faiss.sh``` to initialize the faiss store
 
-add pdfs to pdf directory the default is ```pdf/``` in the project root
+add pdfs to pdf directory the default is ```pdf/``` in the project root create with ```mkdir pdf```
 
 then run ```./sbin/langchain_load_pdfs.sh``` to load pdfs into the faiss store
 
