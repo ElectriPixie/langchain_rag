@@ -8,6 +8,7 @@ from langchain_community.vectorstores import FAISS
 from langchain.embeddings.base import Embeddings
 import argparse
 import psutil
+import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sharedFunctions'))
 from sharedFunctions import add_trailing_slash, get_program_name
 sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
