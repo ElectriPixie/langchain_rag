@@ -90,11 +90,6 @@ parser.add_argument('--gpu',
 # Parse the arguments
 args = parser.parse_args()
 
-if args.vstoreName is not DEFAULT_VSTORE_NAME:
-    vstoreName = add_trailing_slash(args.vstoreName)
-else:
-   vstoreName = add_trailing_slash(DEFAULT_PATH+args.vstoreName)
-
 if args.vstoreDir is not DEFAULT_VSTORE_DIR:
     vstoreDir = add_trailing_slash(args.vstoreDir)
 else:
