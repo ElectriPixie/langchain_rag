@@ -2,10 +2,12 @@
 
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+SCRIPT_NAME="loadPdfs.py"
+SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 # Set default values
 vstoreName="Book_Collection"
-vstoreDir="faiss_store"
+vstoreDir="faiss_Store"
 pdfDir="pdf"
 modelName="all-MiniLM-L6-v2"
 modelDir="models"
@@ -71,7 +73,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${DEFAULT_PATH}/pylib/langchain_load_pdfs.py \
+python3 ${SCRIPT_PATH} \
   --vstoreName    "$vstoreName"  \
   --vstoreDir    "$vstoreDir"  \
   --pdfDir       "$pdfDir"     \
