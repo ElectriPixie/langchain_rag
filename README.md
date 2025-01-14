@@ -14,3 +14,5 @@ add pdfs to pdf directory the default is ```pdf/``` in the project root create w
 then run ```./sbin/loadPdfs.sh``` to load pdfs into the faiss store it will skip pdfs it's already added so more can be added and it can be rerun to update the faiss store
 
 then run either ```./sbin/chatRag.sh``` for command line chat or ```./sbin/gradioRagServer.sh``` to get a web interface to the LLM backed chatbot with RAG services
+
+default values are configured in ```config/config.py```
