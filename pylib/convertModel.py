@@ -36,11 +36,11 @@ parser.add_argument("--gpu",
 
 args = parser.parse_args()
 
-if args.modelDir is not DEFAULT_MODEL_NAME:
+if args.modelDir is not DEFAULT_MODEL_DIR:
     modelDir = add_trailing_slash(args.modelDir)
 else:
    modelDir = add_trailing_slash(DEFAULT_PATH+args.modelDir)
-modelName = args.modelName
+modelName = add_trailing_slash(args.modelName)
 gpu = args.gpu
 modelPath = modelDir+modelName
 
