@@ -5,12 +5,15 @@ DEFAULT_PATH=$(dirname $SCRIPT_DIR)
 SCRIPT_NAME="loadPdfs.py"
 SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
+#source default values shared by python scripts
+source $DEFAULT_PATH/pylib/config/config.py
+
 # Set default values
-vstoreName="Book_Collection"
-vstoreDir=$DEFAULT_PATH/faiss_store
-pdfDir=$DEFAULT_PATH/pdf
-modelName="all-MiniLM-L6-v2"
-modelDir=$DEFAULT_PATH/models
+vstoreName=$DEFAULT_VSTORE_NAME
+vstoreDir=$DEFAULT_PATH/$DEFAULT_VSTORE_DIR
+pdfDir=$DEFAULT_PATH/$DEFAULT_PDF_DIR
+modelName=$DEFAULT_MODEL_NAME
+modelDir=$DEFAULT_PATH/$DEFAULT_MODEL_DIR
 gpu="False"
 help="False"
 
