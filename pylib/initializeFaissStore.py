@@ -68,7 +68,7 @@ else:
 if args.modelName is not DEFAULT_MODEL_NAME:
     modelName = add_trailing_slash(args.modelName)
 else:
-   modelName = add_trailing_slash(DEFAULT_PATH+args.modelName)
+   modelName = add_trailing_slash(args.modelName)
 
 modelPath = modelDir+modelName
 gpu = args.gpu
