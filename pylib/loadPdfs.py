@@ -74,18 +74,16 @@ if args.modelDir is not DEFAULT_MODEL_DIR:
 else:
    modelDir = add_trailing_slash(DEFAULT_PATH+args.modelDir)
 
-if args.modelName is not DEFAULT_MODEL_NAME:
-    modelName = add_trailing_slash(args.modelName)
-else:
-   modelName = add_trailing_slash(DEFAULT_PATH+args.modelName)
-
 if args.pdfDir is not DEFAULT_PDF_DIR:
     pdfDir = add_trailing_slash(args.pdfDir)
 else:
     pdfDir = add_trailing_slash(DEFAULT_PATH+args.pdfDir)
+
+modelName = add_trailing_slash(args.modelName)
 gpu = args.gpu
+
 modelPath = modelDir+modelName
-vstorePath=vstoreDir+vstoreName
+vstorePath = vstoreDir+vstoreName
 
 if not gpu:
     # Set default device to CPU

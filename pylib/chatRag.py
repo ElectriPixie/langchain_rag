@@ -75,10 +75,7 @@ if args.modelDir is not DEFAULT_MODEL_DIR:
 else:
    modelDir = add_trailing_slash(DEFAULT_PATH+args.modelDir)
 
-if args.modelName is not DEFAULT_MODEL_NAME:
-    modelName = add_trailing_slash(args.modelName)
-else:
-   modelName = add_trailing_slash(DEFAULT_PATH+args.modelName)
+modelName = add_trailing_slash(args.modelName)
 
 gpu = args.gpu
 vstorePath=vstoreDir+vstoreName
