@@ -14,6 +14,8 @@ from sharedFunctions import add_trailing_slash, get_program_name
 sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
 from config import DEFAULT_MODEL_DIR, DEFAULT_MODEL_NAME, DEFAULT_VSTORE_DIR, DEFAULT_VSTORE_NAME
 
+print("default_vstore_dir: "+DEFAULT_VSTORE_DIR)
+
 SCRIPT_DIR = os.path.dirname(__file__)
 DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
 
@@ -50,15 +52,18 @@ parser.add_argument('--gpu',
 # Parse the arguments
 args = parser.parse_args()
 
+print("DEFAULT_VSTORE_DIR: "+DEFAULT_VSTORE_DIR)
 if args.vstoreName is not DEFAULT_VSTORE_NAME:
     vstoreName = add_trailing_slash(args.vstoreName)
 else:
-   vstoreName = add_trailing_slash(DEFAULT_PATH+args.vstoreName)
+    vstoreName = add_trailing_slash(DEFAULT_PATH+args.vstoreName)
 
 if args.vstoreDir is not DEFAULT_VSTORE_DIR:
     vstoreDir = add_trailing_slash(args.vstoreDir)
 else:
-   vstore = add_trailing_slash(DEFAULT_PATH+args.vstoreDir)
+    vstoreDir = add_trailing_slash(DEFAULT_PATH+args.vstoreDir)
+
+print("vstoreDir"+vstoreDir)
 
 if args.modelDir is not DEFAULT_MODEL_NAME:
     modelDir = add_trailing_slash(args.modelDir)
