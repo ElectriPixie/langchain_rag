@@ -1,4 +1,6 @@
 #default config file
+#don't add anything but variable declarations here
+#I'm reusing it to source into bash for the scripts in sbin
 
 DEFAULT_MODEL_DIR="models"
 DEFAULT_MODEL_NAME="all-MiniLM-L6-v2"

@@ -5,9 +5,13 @@ DEFAULT_PATH=$(dirname $SCRIPT_DIR)
 SCRIPT_NAME="convertModel.py"
 SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
+#source default values shared by python scripts
+source $DEFAULT_PATH/sbin/config/readConfig.sh
+read_config_file $DEFAULT_PATH/pylib/config/config.py
+
 # Set default values
-modelName="all-MiniLM-L6-v2"
-modelDir=$DEFAULT_PATH/models
+modelName=$DEFAULT_MODEL_NAME
+modelDir=$DEFAULT_PATH/$DEFAULT_MODEL_DIR
 gpu="False"
 help="False"
 
