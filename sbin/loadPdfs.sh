@@ -7,10 +7,10 @@ SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 # Set default values
 vstoreName="Book_Collection"
-vstoreDir="faiss_Store"
-pdfDir="pdf"
+vstoreDir=$DEFAULT_PATH/faiss_store
+pdfDir=$DEFAULT_PATH/pdf
 modelName="all-MiniLM-L6-v2"
-modelDir="models"
+modelDir=$DEFAULT_PATH/models
 gpu="False"
 help="False"
 

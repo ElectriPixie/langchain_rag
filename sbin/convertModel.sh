@@ -7,7 +7,7 @@ SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 # Set default values
 modelName="all-MiniLM-L6-v2"
-modelDir="models"
+modelDir=$DEFAULT_PATH/models
 gpu="False"
 help="False"
 
