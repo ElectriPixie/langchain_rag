@@ -2,11 +2,10 @@
 
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+SCRIPT_NAME="convertModel.py"
+SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 # Set default values
-vstoreName="Book_Collection"
-vstoreDir="faiss_store"
-pdfDir="pdf"
 modelName="all-MiniLM-L6-v2"
 modelDir="models"
 gpu="False"
@@ -15,41 +14,17 @@ help="False"
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --vstoreName)
-      if [[ -n $2 && $2 != -* ]]; then
-        vstoreName="$2"
-        shift 2
-      else
-        shift # Skip invalid value, keep default
-      fi
-      ;;
-    --vstoreDir)
-      if [[ -n $2 && $2 != -* ]]; then
-        vstoreDir="$2"
-        shift 2
-      else
-        shift # Skip invalid value, keep default
-      fi
-      ;;
-    --pdfDir)
-      if [[ -n $2 && $2 != -* ]]; then
-        pdfDir="$2"
-        shift 2
-      else
-        shift # Skip invalid value, keep default
-      fi
-      ;;
-    --modelDir)
-      if [[ -n $2 && $2 != -* ]]; then
-        modelDir="$2"
-        shift 2
-      else
-        shift # Skip invalid value, keep default
-      fi
-      ;;
     --modelName)
       if [[ -n $2 && $2 != -* ]]; then
         modelName="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
+      ;;
+      --modelDir)
+      if [[ -n $2 && $2 != -* ]]; then
+        modelDir="$2"
         shift 2
       else
         shift # Skip invalid value, keep default
@@ -71,11 +46,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${DEFAULT_PATH}/pylib/langchain_load_pdfs.py \
-  --vstoreName    "$vstoreName"  \
-  --vstoreDir    "$vstoreDir"  \
-  --pdfDir       "$pdfDir"     \
-  --modelDir   "$modelDir" \
-  --modelName   "$modelName" \
+python3 ${SCRIPT_PATH} \
+  --modelName "$modelName" \
+  --modelDir "$modelDir" \
   $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")

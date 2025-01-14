@@ -2,10 +2,13 @@
 
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+SCRIPT_NAME="loadPdfs.py"
+SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 # Set default values
 vstoreName="Book_Collection"
-vstoreDir="faiss_store"
+vstoreDir="faiss_Store"
+pdfDir="pdf"
 modelName="all-MiniLM-L6-v2"
 modelDir="models"
 gpu="False"
@@ -25,6 +28,14 @@ while [[ $# -gt 0 ]]; do
     --vstoreDir)
       if [[ -n $2 && $2 != -* ]]; then
         vstoreDir="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
+      ;;
+    --pdfDir)
+      if [[ -n $2 && $2 != -* ]]; then
+        pdfDir="$2"
         shift 2
       else
         shift # Skip invalid value, keep default
@@ -62,9 +73,10 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${DEFAULT_PATH}/pylib/langchain_openai_faiss.py \
-  --vstoreName    "$vstoreName" \
-  --vstoreDir    "$vstoreDir" \
+python3 ${SCRIPT_PATH} \
+  --vstoreName    "$vstoreName"  \
+  --vstoreDir    "$vstoreDir"  \
+  --pdfDir       "$pdfDir"     \
   --modelDir   "$modelDir" \
   --modelName   "$modelName" \
   $([ "$gpu" = "True" ] && echo "--gpu") \

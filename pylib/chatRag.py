@@ -1,4 +1,3 @@
-import gradio as gr
 import os
 from uuid import uuid4
 from langchain_community.document_loaders import PyPDFLoader
@@ -11,52 +10,23 @@ from langchain.embeddings.base import Embeddings
 import json
 from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage
+from colorama import Fore, Style
 from langchain.schema import Document
 import argparse
 import psutil
-
-def add_trailing_slash(path):
-    if not path.endswith('/'):
-        path += '/'
-    return path
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), 'sharedFunctions'))
+from sharedFunctions import add_trailing_slash, get_program_name
+sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
+from config import DEFAULT_MODEL_DIR, DEFAULT_MODEL_NAME, DEFAULT_VSTORE_DIR, DEFAULT_VSTORE_NAME
 
 SCRIPT_DIR = os.path.dirname(__file__)
 DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
-DEFAULT_VSTORE_NAME="Book_Collection"
-DEFAULT_VSTORE_DIR="faiss_store"
-DEFAULT_MODEL_DIR="models"
-DEFAULT_MODEL_NAME="all-MiniLM-L6-v2"
 
 # set True to skip to general knowlege when no documents are found
 skipToGeneralKnowlege = 1
 
-# Get the parent process ID
-parent_pid = os.getppid()
-
-# Fetch the parent process
-parent_process = psutil.Process(parent_pid)
-
-# Use cmdline to get the full command with arguments
-parent_cmdline = parent_process.cmdline()
-
-# Extract the calling script name from cmdline
-if len(parent_cmdline) > 1:  # Check if there are arguments
-    run_script_name = os.path.basename(parent_cmdline[1])  # Get only the file name
-else:
-    run_script_name = "Unknown"
-
-# Get the current Python script name
-script_name = os.path.basename(__file__)
-
-# Remove extensions for comparison
-run_script_base = os.path.splitext(run_script_name)[0]
-script_base = os.path.splitext(script_name)[0]
-
-# Compare base names
-if run_script_base == script_base:
-    prog_name=run_script_name
-else:
-    prog_name=script_name
+prog_name = get_program_name()
 
 parser = argparse.ArgumentParser(prog=prog_name)
 
@@ -109,15 +79,16 @@ if args.modelName is not DEFAULT_MODEL_NAME:
     modelName = add_trailing_slash(args.modelName)
 else:
    modelName = add_trailing_slash(DEFAULT_PATH+args.modelName)
-modelPath = modelDir+modelName
 
 gpu = args.gpu
 vstorePath=vstoreDir+vstoreName
+modelPath = modelDir+modelName
 
 if not gpu:
     # Set default device to CPU
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
     torch.set_default_device('cpu')
+
 
 # Define the custom embeddings class that inherits from LangChain's Embeddings class
 class SentenceTransformerEmbeddings(Embeddings):
@@ -133,17 +104,22 @@ class SentenceTransformerEmbeddings(Embeddings):
     def embed_documents(self, documents: list):
         return [self.embed_query(doc) for doc in documents]
 
-
-# Paths and settings
-chatuser = "User: \n"
-chatmodel = "Llama-RAG - "
-
+# Chat interface settings
+user = "User: "
+chatmodel = "\nLlama-RAG - "
+bright = Style.BRIGHT 
+dim = Style.DIM
+reset = Style.RESET_ALL
+usercolor = reset+bright+Fore.GREEN
+usertext = reset+bright+Fore.CYAN
+ragcolor = reset+bright+Fore.GREEN
+ragtext = reset+bright+Fore.CYAN
 
 # Create custom embeddings object and load the saved model weights (embeddings.pt)
 embeddings = SentenceTransformerEmbeddings(modelPath=modelPath)
 
 #if not gpu:
-#    embeddings.model.to('cpu')
+    #embeddings.model.to('cpu')
 
 # Load documents from the JSON file
 try:
@@ -195,17 +171,16 @@ chat = ChatOpenAI(
     max_tokens=2048,
     temperature=0.7
 )
-
 # Define the function to interact with the chat model
 def chatFunc(message):
     knowledge_base = "Book Collection: \n"
     # Search for relevant documents based on the message
     retrieved_documents = retriever.invoke(message)
-    
+
     if skipToGeneralKnowlege:
         if not retrieved_documents:
-           knowledge_base = "General Knowledge: \n"
-           return chat_with_general_knowledge(message)
+            knowledge_base = "General Knowledge: \n"
+            return chat_with_general_knowledge(message)
     
     # Create a retriever from the documents and use similarity search
     db = FAISS.from_documents(retrieved_documents, embeddings)
@@ -226,7 +201,6 @@ def chatFunc(message):
     # Get response from the chat model
     response = chat.invoke(messages)
     if response.content == 'NA' or response.content == "Not found in current context.":
-        #print("context_response: "+response.content)
         knowledge_base = "General Knowledge: \n"
         messages = [
             SystemMessage(
@@ -235,7 +209,7 @@ def chatFunc(message):
             HumanMessage(content=message),
         ]
         response = chat.invoke(messages)
-    return chatmodel+knowledge_base+"\n"+response.content
+    return response, knowledge_base
 
 # Fallback to general knowledge when no relevant documents are found
 def chat_with_general_knowledge(message):
@@ -248,9 +222,11 @@ def chat_with_general_knowledge(message):
     response = chat.invoke(messages)
     return response.content
 
-# Wrapper function to pass the `retriever` to `chatFunc`
-def wrapped_chatFunc(message, type):
-    return chatFunc(message)
-
-# Use the wrapper in the Gradio interface
-gr.ChatInterface(wrapped_chatFunc, type="messages").launch()
+# Interactive loop for user input and AI response
+while True:
+    message = input(Fore.GREEN + Style.BRIGHT + "User: " + Style.RESET_ALL + "\n" + Fore.CYAN + Style.BRIGHT)
+    if message == "goodbye":
+        print(Style.RESET_ALL)
+        break
+    response, knowledge_base = chatFunc(message)
+    print(ragcolor + chatmodel + knowledge_base + ragtext + response.content+"\n"+reset)

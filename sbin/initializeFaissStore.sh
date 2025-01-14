@@ -2,8 +2,12 @@
 
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+SCRIPT_NAME="initializeFaissStore.py"
+SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 # Set default values
+vstoreName="Book_Collection"
+vstoreDir="faiss_store"
 modelName="all-MiniLM-L6-v2"
 modelDir="models"
 gpu="False"
@@ -12,17 +16,33 @@ help="False"
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --modelName)
+    --vstoreName)
       if [[ -n $2 && $2 != -* ]]; then
-        modelName="$2"
+        vstoreName="$2"
         shift 2
       else
         shift # Skip invalid value, keep default
       fi
       ;;
-      --modelDir)
+    --vstoreDir)
+      if [[ -n $2 && $2 != -* ]]; then
+        vstoreDir="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
+      ;;
+    --modelDir)
       if [[ -n $2 && $2 != -* ]]; then
         modelDir="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
+      ;;
+    --modelName)
+      if [[ -n $2 && $2 != -* ]]; then
+        modelName="$2"
         shift 2
       else
         shift # Skip invalid value, keep default
@@ -44,8 +64,10 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${DEFAULT_PATH}/pylib/convert_model.py \
-  --modelName "$modelName" \
-  --modelDir "$modelDir" \
+python3 ${SCRIPT_PATH} \
+  --vstoreName    "$vstoreName" \
+  --vstoreDir    "$vstoreDir" \
+  --modelDir   "$modelDir" \
+  --modelName   "$modelName" \
   $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")

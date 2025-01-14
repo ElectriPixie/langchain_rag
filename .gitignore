@@ -4,3 +4,4 @@ all-MiniLM-L6-v2/
 models/
 pdf
 pdf/
+__pycache__

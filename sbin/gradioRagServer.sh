@@ -2,6 +2,8 @@
 
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+SCRIPT_NAME="gradioRagServer.py"
+SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 # Set default values
 vstoreName="Book_Collection"
@@ -62,7 +64,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${DEFAULT_PATH}/pylib/gradio_langchain_rag_server.py \
+python3 ${SCRIPT_PATH} \
   --vstoreName    "$vstoreName" \
   --vstoreDir    "$vstoreDir" \
   --modelDir   "$modelDir" \
