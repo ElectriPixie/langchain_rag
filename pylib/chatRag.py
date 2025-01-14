@@ -68,7 +68,7 @@ else:
 if args.vstoreDir is not DEFAULT_VSTORE_DIR:
     vstoreDir = add_trailing_slash(args.vstoreDir)
 else:
-   vstore = add_trailing_slash(DEFAULT_PATH+args.vstoreDir)
+   vstoreDir = add_trailing_slash(DEFAULT_PATH+args.vstoreDir)
 
 if args.modelDir is not DEFAULT_MODEL_DIR:
     modelDir = add_trailing_slash(args.modelDir)
