@@ -2,12 +2,14 @@
 
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+SCRIPT_NAME="langchain_initialize_faiss.py"
+SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 # Set default values
 vstoreName="Book_Collection"
-vstoreDir="faiss_store"
+vstoreDir=$DEFAULT_PATH/faiss_store
 modelName="all-MiniLM-L6-v2"
-modelDir="models"
+modelDir=$DEFAULT_PATH/models
 gpu="False"
 help="False"
 
@@ -62,7 +64,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${DEFAULT_PATH}/pylib/langchain_initialize_faiss.py \
+python3 ${SCRIPT_PATH} \
   --vstoreName    "$vstoreName" \
   --vstoreDir    "$vstoreDir" \
   --modelDir   "$modelDir" \
