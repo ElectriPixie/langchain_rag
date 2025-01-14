@@ -46,7 +46,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${SCRIPT_PATH}} \
+python3 ${SCRIPT_PATH} \
   --modelName "$modelName" \
   --modelDir "$modelDir" \
   $([ "$gpu" = "True" ] && echo "--gpu") \

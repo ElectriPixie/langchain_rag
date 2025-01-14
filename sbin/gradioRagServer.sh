@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${DEFAULT_PATH}/${SCRIPT_NAME} \
+python3 ${SCRIPT_PATH} \
   --vstoreName    "$vstoreName" \
   --vstoreDir    "$vstoreDir" \
   --modelDir   "$modelDir" \
