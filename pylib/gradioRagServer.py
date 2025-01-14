@@ -13,6 +13,7 @@ from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage
 from langchain.schema import Document
 import argparse
+import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sharedFunctions'))
 from sharedFunctions import add_trailing_slash, get_program_name
 sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
