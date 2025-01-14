@@ -59,11 +59,6 @@ parser.add_argument('--gpu',
 args = parser.parse_args()
 # Assign the values to the variables
 
-if args.vstoreName is not DEFAULT_VSTORE_NAME:
-    vstoreName = add_trailing_slash(args.vstoreName)
-else:
-   vstoreName = add_trailing_slash(DEFAULT_PATH+args.vstoreName)
-
 if args.vstoreDir is not DEFAULT_VSTORE_DIR:
     vstoreDir = add_trailing_slash(args.vstoreDir)
 else:
@@ -79,6 +74,7 @@ if args.pdfDir is not DEFAULT_PDF_DIR:
 else:
     pdfDir = add_trailing_slash(DEFAULT_PATH+args.pdfDir)
 
+vstoreName = add_trailing_slash(args.vstoreName)
 modelName = add_trailing_slash(args.modelName)
 gpu = args.gpu
 
