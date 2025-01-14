@@ -6,7 +6,8 @@ SCRIPT_NAME="initializeFaissStore.py"
 SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 #source default values shared by python scripts
-source $DEFAULT_PATH/pylib/config/config.py
+source $DEFAULT_PATH/sbin/config/readConfig.sh
+read_config_file $DEFAULT_PATH/pylib/config/config.py
 
 # Set default values
 vstoreName=$DEFAULT_VSTORE_NAME

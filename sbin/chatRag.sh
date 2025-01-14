@@ -6,7 +6,7 @@ SCRIPT_NAME="chatRag.py"
 SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
 #source default values shared by python scripts
-source $DEFAULT_PATH/pylib/config/config.py
+source $DEFAULT_PATH/sbin/config/config.py
 
 # Set default values
 vstoreName=$DEFAULT_VSTORE_NAME
