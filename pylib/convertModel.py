@@ -30,6 +30,9 @@ def get_program_name():
         return script_name
 
 def main():
+    SCRIPT_DIR = os.path.dirname(__file__)
+    DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
+
     prog_name = get_program_name()
 
     parser = argparse.ArgumentParser(prog=prog_name)
@@ -57,7 +60,7 @@ def main():
     if modelDir is not DEFAULT_MODEL_DIR:
         modelDir = add_trailing_slash(modelDir)
     else:
-        modelDir = add_trailing_slash(os.path.join(DEFAULT_MODEL_DIR, modelName))
+        modelDir = add_trailing_slash(DEFAULT_PATH+modelDir)
 
     modelPath = modelDir+modelName
     print(modelPath)
