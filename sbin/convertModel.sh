@@ -1,8 +1,9 @@
 #!/bin/bash
+python="python3"
 
 REL_SCRIPT_DIR=$(dirname "$0")
 source $REL_SCRIPT_DIR/sharedFunctions/sharedFunctions.sh
-source $REL_SCRIPT_PATH/config/readConfig.sh
+source $REL_SCRIPT_DIR/config/readConfig.sh
 SCRIPT_DIR=$(get_script_dir "$0")
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
 
@@ -50,7 +51,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${SCRIPT_PATH} \
+$python ${SCRIPT_PATH} \
   --modelName "$modelName" \
   --modelDir "$modelDir" \
   $([ "$gpu" = "True" ] && echo "--gpu") \
