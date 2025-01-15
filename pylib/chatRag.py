@@ -18,7 +18,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sharedFunctions'))
 from sharedFunctions import add_trailing_slash
 sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
-from config import DEFAULT_MODEL_DIR, DEFAULT_MODEL_NAME, DEFAULT_VSTORE_DIR, DEFAULT_VSTORE_NAME, DEFAULT_RETRIEVE_NUM
+from config import DEFAULT_MODEL_DIR, DEFAULT_MODEL_NAME, DEFAULT_VSTORE_DIR, DEFAULT_VSTORE_NAME, DEFAULT_RETRIEVE_NUM, DEFAULT_SEARCH_OPTION
 
 def get_program_name():
     parent_pid = os.getppid()
@@ -73,6 +73,9 @@ def main():
                         default=DEFAULT_MODEL_NAME, 
                         help='Model name: The name of the model to be used. This is used to load the model. (e.g. "all-MiniLM-L6-v2")')
 
+    parser.add_argument('--searchOption', type=str, choices=['exact', 'threshold', 'knn', 'mmr', 'similarity'], default=DEFAULT_SEARCH_OPTION,
+                    help='search type: exact, threshold, knn, mmr, similarity')
+
     parser.add_argument('--retrieveNum', type=int, default=DEFAULT_RETRIEVE_NUM,
                     help=f'Number of documents to retrieve from the vector store. Default is {DEFAULT_RETRIEVE_NUM}.')
 
@@ -96,6 +99,7 @@ def main():
 
     modelName = add_trailing_slash(args.modelName)
     vstoreName = add_trailing_slash(args.vstoreName)
+    searchOption = args.searchOption
     retrieveNum = args.retrieveNum
     gpu = args.gpu
 
@@ -176,7 +180,7 @@ def main():
     vector_store.index = faiss.read_index(os.path.join(vstorePath, f"index.faiss"))
 
     # Create a retriever from the vector store
-    retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": retrieveNum})
+    retriever = vector_store.as_retriever(search_type=searchOption, search_kwargs={"k": retrieveNum})
 
     # Initialize the chat model
     chat = ChatOpenAI(
