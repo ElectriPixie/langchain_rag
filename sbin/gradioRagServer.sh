@@ -5,7 +5,7 @@ DEFAULT_PATH=$(dirname $SCRIPT_DIR)
 SCRIPT_NAME="gradioRagServer.py"
 SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
 
-eval $(python3 $DEFAULT_PATH/pylib/config/bashConfig.py)
+source $DEFAULT_PATH/sbin/config/readConfig.sh
 
 # Set default values
 vstoreName=$DEFAULT_VSTORE_NAME
