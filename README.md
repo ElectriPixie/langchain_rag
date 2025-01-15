@@ -5,7 +5,7 @@
 
 I use this with a local llama.cpp running, it will require a compatible backend interface
 
-run ```./convert_model.py``` to save the model for reuse without using unsafe deserializations 
+run ```./convert_model.sh``` to save the model for reuse without using unsafe deserializations 
 
 then run ```./langchain_initialize_faiss.sh``` to initialize the faiss store
 

@@ -3,3 +3,4 @@ faiss_store
 all-MiniLM-L6-v2/
 pdf/
 pdf
+__pycache__
