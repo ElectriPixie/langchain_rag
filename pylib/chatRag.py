@@ -237,9 +237,9 @@ def chat_with_general_knowledge(message):
 
 # Interactive loop for user input and AI response
 while True:
-    message = input(Fore.GREEN + Style.BRIGHT + "User: " + Style.RESET_ALL + "\n" + Fore.CYAN + Style.BRIGHT)
+    message = input(usercolor + "User: " + reset + "\n" + usertext)
     if message == "goodbye":
-        print(Style.RESET_ALL)
+        print(reset)
         break
     response, knowledge_base = chatFunc(message)
     print(ragcolor + chatmodel + knowledge_base + ragtext + response.content+"\n"+reset)
