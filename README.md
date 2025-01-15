@@ -17,4 +17,6 @@ then run either ```./sbin/chatRag.sh``` or ```python3 pylib/chatRag.py``` for co
 
 default values are configured in ```config/config.py```
 
+all the scripts have help strings so you can use ```--help``` or ```-h``` to get an explaination of options
+
 the bash scripts should run on most posix compliant operating systems. Hopefully it works for everyone but it's just a wrapper you can call the scripts directly

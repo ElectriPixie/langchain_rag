@@ -36,6 +36,7 @@ vstoreDir=$DEFAULT_PATH/$DEFAULT_VSTORE_DIR
 modelName=$DEFAULT_MODEL_NAME
 modelDir=$DEFAULT_PATH/$DEFAULT_MODEL_DIR
 retrieveNum=$DEFAULT_RETRIEVE_NUM
+searchOption=$DEFAULT_SEARCH_OPTION
 gpu="False"
 help="False"
 
@@ -74,6 +75,14 @@ while [[ $# -gt 0 ]]; do
         shift # Skip invalid value, keep default
       fi
       ;;
+    --searchOption)
+      if [[ -n $2 && $2 != -* ]]; then
+        searchOption="$2"
+        shift 2
+      else
+        shift # Skip invalid value, keep default
+      fi
+      ;;
     --gpu)
       gpu="True"
       shift
@@ -96,5 +105,6 @@ $python ${SCRIPT_PATH} \
   --modelDir   "$modelDir" \
   --modelName   "$modelName" \
   --retrieveNum "$retrieveNum" \
+  --searchOption "$searchOption" \
   $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")
