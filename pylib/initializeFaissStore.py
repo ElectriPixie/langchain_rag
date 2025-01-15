@@ -112,7 +112,8 @@ def main():
     embeddings = SentenceTransformerEmbeddings(modelPath=modelPath)
 
     # Create the FAISS index
-    index = faiss.IndexFlatL2(embeddings.model.get_sentence_embedding_dimension())
+    dimension = embeddings.model.get_sentence_embedding_dimension()
+    index = faiss.index_factory(dimension, "Flat", faiss.METRIC_L2)
 
     # Create the FAISS vector store
     vector_store = FAISS(
