@@ -136,9 +136,6 @@ def main():
     # Create custom embeddings object and load the saved model weights (embeddings.pt)
     embeddings = SentenceTransformerEmbeddings(modelPath=modelPath)
 
-    #if not gpu:
-        #embeddings.model.to('cpu')
-
     # Load documents from the JSON file
     try:
         with open(os.path.join(vstorePath, "documents.json"), "r") as doc_file:
