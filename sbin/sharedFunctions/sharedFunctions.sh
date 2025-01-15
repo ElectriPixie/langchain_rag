@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 get_script_dir() {
     local target_file="$1"

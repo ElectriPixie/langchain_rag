@@ -1,3 +1,5 @@
+#!/bin/bash
+
 SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
 SBIN_DIR=$(dirname $SCRIPT_DIR)
 DEFAULT_PATH=$(dirname $SBIN_DIR)
