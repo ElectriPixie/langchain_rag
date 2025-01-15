@@ -12,6 +12,7 @@ parser.add_argument('--DEFAULT_MODEL_NAME', action='store_true')
 parser.add_argument('--DEFAULT_VSTORE_DIR', action='store_true')
 parser.add_argument('--DEFAULT_VSTORE_NAME', action='store_true')
 parser.add_argument('--DEFAULT_PDF_DIR', action='store_true')
+parser.add_argument('--DEFAULT_RETRIEVE_NUM', action='store_true')
 
 args = parser.parse_args()
 
@@ -25,3 +26,5 @@ if args.DEFAULT_VSTORE_NAME:
     print(getattr(config, 'DEFAULT_VSTORE_NAME'))
 if args.DEFAULT_PDF_DIR:
     print(getattr(config, 'DEFAULT_PDF_DIR'))
+if args.DEFAULT_RETRIEVE_NUM:
+    print(getattr(config, 'DEFAULT_RETRIEVE_NUM'))

@@ -35,6 +35,7 @@ vstoreName=$DEFAULT_VSTORE_NAME
 vstoreDir=$DEFAULT_PATH/$DEFAULT_VSTORE_DIR
 modelName=$DEFAULT_MODEL_NAME
 modelDir=$DEFAULT_PATH/$DEFAULT_MODEL_DIR
+retrieveNum=$DEFAULT_RETRIEVE_NUM
 gpu="False"
 help="False"
 
@@ -94,5 +95,6 @@ $python ${SCRIPT_PATH} \
   --vstoreDir    "$vstoreDir" \
   --modelDir   "$modelDir" \
   --modelName   "$modelName" \
+  --retrieveNum "$retrieveNum" \
   $([ "$gpu" = "True" ] && echo "--gpu") \
   $([ "$help" = "True" ] && echo "--help")
