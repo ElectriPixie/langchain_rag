@@ -1,16 +1,36 @@
 import os
 import torch
 from sentence_transformers import SentenceTransformer
-import argparse
 import psutil
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sharedFunctions'))
-from sharedFunctions import add_trailing_slash, get_program_name
+from sharedFunctions import add_trailing_slash
 sys.path.append(os.path.join(os.path.dirname(__file__), 'config'))
 from config import DEFAULT_MODEL_DIR, DEFAULT_MODEL_NAME
+import argparse
 
 SCRIPT_DIR = os.path.dirname(__file__)
 DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
+
+def get_program_name():
+    parent_pid = os.getppid()
+    parent_process = psutil.Process(parent_pid)
+    parent_cmdline = parent_process.cmdline()
+
+    if len(parent_cmdline) > 1:  # Check if there are arguments
+        run_script_name = os.path.basename(parent_cmdline[1])  # Get only the file name
+    else:
+        run_script_name = "Unknown"
+
+    script_name = os.path.basename(__file__)
+
+    run_script_base = os.path.splitext(run_script_name)[0]
+    script_base = os.path.splitext(script_name)[0]
+
+    if run_script_base == script_base:
+        return run_script_name
+    else:
+        return script_name
 
 prog_name = get_program_name()
 
