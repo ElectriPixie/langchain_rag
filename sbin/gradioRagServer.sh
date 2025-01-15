@@ -1,11 +1,31 @@
 #!/bin/bash
 python="python3"
 
-REL_SCRIPT_DIR=$(dirname "$0")
-source $REL_SCRIPT_DIR/sharedFunctions/sharedFunctions.sh
-source $REL_SCRIPT_DIR/config/readConfig.sh
+get_script_dir() {
+    local target_file="$1"
+    
+    # Function to resolve symlinks
+    resolve_symlink() {
+        local file="$1"
+        while [ -L "$file" ]; do
+            local dir
+            dir="$(cd "$(dirname "$file")" && pwd -P)"
+            file="$(ls -l "$file" | awk '{print $NF}')"
+            [ "${file:0:1}" != "/" ] && file="$dir/$file"
+        done
+        echo "$file"
+    }
+    
+    # Resolve the full path of the script
+    target_file="$(resolve_symlink "$target_file")"
+    
+    # Return the absolute directory
+    cd "$(dirname "$target_file")" && pwd -P
+}
+
 SCRIPT_DIR=$(get_script_dir "$0")
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+source $DEFAULT_PATH/sbin/config/readConfig.sh
 
 SCRIPT_NAME="gradioRagServer.py"
 SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
