@@ -1,13 +1,14 @@
 #!/bin/bash
+python="python3"
 
-SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE[0]))
+REL_SCRIPT_DIR=$(dirname "$0")
+source $REL_SCRIPT_DIR/sharedFunctions/sharedFunctions.sh
+source $REL_SCRIPT_DIR/config/readConfig.sh
+SCRIPT_DIR=$(get_script_dir "$0")
 DEFAULT_PATH=$(dirname $SCRIPT_DIR)
+
 SCRIPT_NAME="convertModel.py"
 SCRIPT_PATH=$DEFAULT_PATH/pylib/$SCRIPT_NAME
-
-#source default values shared by python scripts
-source $DEFAULT_PATH/sbin/config/readConfig.sh
-read_config_file $DEFAULT_PATH/pylib/config/config.py
 
 # Set default values
 modelName=$DEFAULT_MODEL_NAME
@@ -50,7 +51,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Run the Python script with arguments
-python3 ${SCRIPT_PATH} \
+$python ${SCRIPT_PATH} \
   --modelName "$modelName" \
   --modelDir "$modelDir" \
   $([ "$gpu" = "True" ] && echo "--gpu") \
