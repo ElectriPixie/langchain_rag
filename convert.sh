@@ -1,1 +1,0 @@
-sbin/convertModel.sh
