@@ -63,7 +63,6 @@ def main():
         modelDir = add_trailing_slash(DEFAULT_PATH+modelDir)
 
     modelPath = modelDir+modelName
-    print(modelPath)
 
     if not gpu:
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
