@@ -43,7 +43,7 @@ def get_program_name():
 def main():
     prog_name = get_program_name()
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog=prog_name)
     # Define the name of the vector store
     parser.add_argument('--vstoreName',
                         type=str,

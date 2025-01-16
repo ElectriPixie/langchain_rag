@@ -85,7 +85,7 @@ def main():
                         help='Device: Use GPU instead of CPU (default). This is used to specify the device to use.')
 
     # Parse the arguments
-    args = parser.parse_args()
+    args = parser.parse_args(prog=prog_name)
 
     if args.vstoreDir is not DEFAULT_VSTORE_DIR:
         vstoreDir = add_trailing_slash(args.vstoreDir)

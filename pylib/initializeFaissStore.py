@@ -33,12 +33,13 @@ def get_program_name():
         return run_script_name
     else:
         return script_name
+
 def main():
     SCRIPT_DIR = os.path.dirname(__file__)
     DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
     prog_name = get_program_name()
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog=prog_name)
     # Define the name of the vector store
     parser.add_argument('--vstoreName',
                         type=str,
@@ -114,14 +115,6 @@ def main():
     # Create the FAISS index
     dimension = embeddings.model.get_sentence_embedding_dimension()
     index = faiss.index_factory(dimension, "Flat", faiss.METRIC_L2)
-
-    # Create the FAISS vector store
-    vector_store = FAISS(
-        embedding_function=embeddings,  # Pass the custom embeddings object
-        index=index,
-        docstore=InMemoryDocstore(),
-        index_to_docstore_id={},
-    )
 
     # Save the FAISS index
     faiss.write_index(index, os.path.join(vstorePath, f"index.faiss"))

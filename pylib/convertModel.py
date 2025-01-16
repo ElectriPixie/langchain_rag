@@ -33,7 +33,7 @@ def main():
     SCRIPT_DIR = os.path.dirname(__file__)
     DEFAULT_PATH = add_trailing_slash(os.path.dirname(SCRIPT_DIR))
 
-    prog_name = get_program_name()
+    prog_name = get_program_name(prog=prog_name)
 
     parser = argparse.ArgumentParser(prog=prog_name)
 
