@@ -45,7 +45,7 @@ def get_program_name():
         return script_name
 
 def main():
-    prog_name = get_program_name()
+    prog_name = get_program_name(prog=prog_name)
 
     # set True to skip to general knowlege when no documents are found
     skipToGeneralKnowlege = 1
